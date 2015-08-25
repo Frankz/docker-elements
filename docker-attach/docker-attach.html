@@ -1,0 +1,68 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../x-websocket/dist/x-websocket.html">
+<script src="term.js"></script>
+
+<dom-module id="docker-attach">
+	<template>
+		<style>
+		#terminal {
+			overflow-y: auto;
+			height:600px;
+		}
+		</style>
+		<x-websocket id="webSocket" url="{{url}}"></x-websocket>
+		<div id="terminal"></div>
+	</template>
+</dom-module>
+
+<script>
+	Polymer({
+		is: 'docker-attach',
+		properties: {
+			containerid : {
+				type: String
+			},
+			host: {
+				type: String
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host, containerid)'
+			},
+			term: {
+				type: Object,
+				value: function() {
+					return new Terminal({
+			            cols: 125,
+			            rows: 24,
+			            convertEol: true,
+			            useStyle: true,
+			            cursorBlink: true,
+			            screenKeys: true
+			        });
+				}
+			} 
+		},
+		listeners: {
+			'message': 'handleReceive'
+		},
+		computeUrl: function(host, containerid) {
+			return "ws://" + host +"/containers/" + containerid + "/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1";
+		},
+
+		ready: function() {
+			this.$.webSocket.open();
+			var that = this;
+			this.term.on('data', function(data) {
+            	that.$.webSocket.send(data);
+          	});
+			this.term.open(this.$.terminal);
+		},
+		attached: function() {
+			this.$.webSocket.send('\n');
+		},
+		handleReceive: function(e) {
+			this.term.write(e.detail.data);			
+		}
+	});
+</script>
