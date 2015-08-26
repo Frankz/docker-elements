@@ -41,25 +41,56 @@
 			            screenKeys: true
 			        });
 				}
-			} 
+			},
+			logs: {
+				type: Number,
+				value: 1
+			},
+			stream :{
+				type: Number,
+				value: 1
+			},
+			stdin: {
+				type: Number,
+				value: 1
+			},
+			stdout: {
+				type: Number,
+				value: 1
+			},
+			stderr: {
+				type: Number,
+				value: 1
+			},
+			readonly: {
+				type: Boolean,
+				value: false
+			}
 		},
 		listeners: {
 			'message': 'handleReceive'
 		},
 		computeUrl: function(host, containerid) {
-			return "ws://" + host +"/containers/" + containerid + "/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1";
+			return "ws://" + host +"/containers/" + containerid + "/attach/ws?logs="+this.logs+"&stream="+this.stream+"&stdin="+this.stdin+"&stdout="+this.stdout+"&stderr="+this.stderr;
 		},
 
 		ready: function() {
 			this.$.webSocket.open();
-			var that = this;
-			this.term.on('data', function(data) {
-            	that.$.webSocket.send(data);
-          	});
+			
+			if (!this.readonly)
+			{
+				var that = this;
+				this.term.on('data', function(data) {
+	            	that.$.webSocket.send(data);
+	          	});
+			}
 			this.term.open(this.$.terminal);
 		},
 		attached: function() {
-			this.$.webSocket.send('\n');
+			if(!this.readonly)
+			{
+				this.$.webSocket.send('\n');
+			}
 		},
 		handleReceive: function(e) {
 			this.term.write(e.detail.data);			
