@@ -93,6 +93,9 @@
 	            	console.log(data);
 	          	});
 			}
+			if(this.windows) {
+				this.term.colors[256] = "#2e3436";
+			}
 			this.term.open(this.$.terminal);
 		},
 		attached: function() {
