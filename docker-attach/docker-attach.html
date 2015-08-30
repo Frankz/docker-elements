@@ -44,7 +44,7 @@
 			},
 			logs: {
 				type: Number,
-				value: 1
+				value: 0
 			},
 			stream :{
 				type: Number,
@@ -65,6 +65,10 @@
 			readonly: {
 				type: Boolean,
 				value: false
+			},
+			windows: {
+				type: Boolean,
+				value: false
 			}
 		},
 		listeners: {
@@ -75,13 +79,18 @@
 		},
 
 		ready: function() {
-			this.$.webSocket.open();
-			
+			this.$.webSocket.open();			
 			if (!this.readonly)
 			{
 				var that = this;
-				this.term.on('data', function(data) {
-	            	that.$.webSocket.send(data);
+				this.term.on('data', function(data) {	  
+	            	if(that.windows && data == '') { 
+	            		//Backspace	in windows
+	            		that.$.webSocket.send(unescape('%08'));
+	            	} else {
+	            		that.$.webSocket.send(data);	
+	            	}
+	            	console.log(data);
 	          	});
 			}
 			this.term.open(this.$.terminal);
@@ -89,11 +98,13 @@
 		attached: function() {
 			if(!this.readonly)
 			{
-				this.$.webSocket.send('\n');
+
 			}
 		},
 		handleReceive: function(e) {
 			this.term.write(e.detail.data);			
 		}
+
+
 	});
 </script>
