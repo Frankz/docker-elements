@@ -7,7 +7,7 @@
 		<style>
 		#terminal {
 			overflow-y: auto;
-			height:600px;
+			height:600px;			
 		}
 		</style>
 		<x-websocket id="webSocket" url="{{url}}"></x-websocket>
@@ -33,8 +33,8 @@
 				type: Object,
 				value: function() {
 					return new Terminal({
-			            cols: 125,
-			            rows: 24,
+			            cols: 125, //125
+			            rows: 24, //24
 			            convertEol: true,
 			            useStyle: true,
 			            cursorBlink: true,
@@ -69,6 +69,10 @@
 			windows: {
 				type: Boolean,
 				value: false
+			},
+			command: {
+				type: String,
+				value: ''
 			}
 		},
 		listeners: {
@@ -89,20 +93,22 @@
 	            		that.$.webSocket.send(unescape('%08'));
 	            	} else {
 	            		that.$.webSocket.send(data);	
-	            	}
-	            	console.log(data);
+	            	}	            	
 	          	});
 			}
 			if(this.windows) {
 				this.term.colors[256] = "#2e3436";
 			}
+			this.term.colors[256] = "#2e3436";
 			this.term.open(this.$.terminal);
 		},
 		attached: function() {
-			if(!this.readonly)
-			{
-
+			if(this.command != "") {
+				this.$.webSocket.send(this.command+"\n");
+			} else {
+				this.$.webSocket.send("\n");
 			}
+			document.querySelector(".terminal").style.borderRadius = "12px";
 		},
 		handleReceive: function(e) {
 			this.term.write(e.detail.data);			

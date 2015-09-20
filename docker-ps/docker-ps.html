@@ -1,0 +1,40 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-ps">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-ps',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true,
+				value: function() {
+					return [];
+				}
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host, containerid)'
+			},
+		},
+		computeUrl: function(host, containerid) {
+			return "http://" + host +"/containers/json";
+		},
+		handleResponse: function(e) {
+			console.log(e);
+		}
+
+	})
+</script>
