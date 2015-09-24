@@ -1,17 +1,9 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../x-websocket/dist/x-websocket.html">
-<script src="term.js"></script>
 
 <dom-module id="docker-attach">
 	<template>
-		<style>
-		#terminal {
-			overflow-y: auto;
-			height:600px;			
-		}
-		</style>
 		<x-websocket id="webSocket" url="{{url}}"></x-websocket>
-		<div id="terminal"></div>
 	</template>
 </dom-module>
 
@@ -28,19 +20,6 @@
 			url: {
   				type: String,
   				computed: 'computeUrl(host, containerid)'
-			},
-			term: {
-				type: Object,
-				value: function() {
-					return new Terminal({
-			            cols: 125, //125
-			            rows: 24, //24
-			            convertEol: true,
-			            useStyle: true,
-			            cursorBlink: true,
-			            screenKeys: true
-			        });
-				}
 			},
 			logs: {
 				type: Number,
@@ -70,9 +49,9 @@
 				type: Boolean,
 				value: false
 			},
-			command: {
-				type: String,
-				value: ''
+			auto: {
+				type: Boolean,
+				value: true
 			}
 		},
 		listeners: {
@@ -82,38 +61,34 @@
 			return "ws://" + host +"/containers/" + containerid + "/attach/ws?logs="+this.logs+"&stream="+this.stream+"&stdin="+this.stdin+"&stdout="+this.stdout+"&stderr="+this.stderr;
 		},
 
-		ready: function() {
-			this.$.webSocket.open();			
-			if (!this.readonly)
-			{
-				var that = this;
-				this.term.on('data', function(data) {	  
-	            	if(that.windows && data == '') { 
-	            		//Backspace	in windows
-	            		that.$.webSocket.send(unescape('%08'));
-	            	} else {
-	            		that.$.webSocket.send(data);	
-	            	}	            	
-	          	});
-			}
-			if(this.windows) {
-				this.term.colors[256] = "#2e3436";
-			}
-			this.term.colors[256] = "#2e3436";
-			this.term.open(this.$.terminal);
+		open: function() {
+			this.$.webSocket.open();
 		},
-		attached: function() {
-			if(this.command != "") {
-				this.$.webSocket.send(this.command+"\n");
-			} else {
-				this.$.webSocket.send("\n");
-			}
-			document.querySelector(".terminal").style.borderRadius = "12px";
+
+		send: function(data) {
+			if(!this.readonly) {
+	            if(this.windows && data == '') { 
+	            	//Backspace	in windows
+	            	this.$.webSocket.send(unescape('%08'));
+	            } else {
+	            	this.$.webSocket.send(data);	
+	         	}
+	        }
 		},
+
+		close: function() {
+			this.$.webSocket.close()
+		},
+
 		handleReceive: function(e) {
-			this.term.write(e.detail.data);			
+			this.fire('docker-attach-message',{data: e.detail.data});
+		},
+
+		ready: function() {
+			//Auto Open
+			if(this.auto) {
+				this.$.webSocket.open();
+			}
 		}
-
-
 	});
 </script>

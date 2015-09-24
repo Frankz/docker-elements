@@ -1,0 +1,104 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="docker-attach.html">
+<script src="term.js"></script>
+
+<dom-module id="docker-attach-terminal">
+	<template>
+		<style>
+		#terminal {
+			overflow-y: auto;
+			height:600px;
+		}
+		</style>
+		<docker-attach id="attach" containerid="{{containerid}}" host="{{host}}" logs="{{logs}}" stream="{{stream}}" stdin="{{stdin}}" stdout="{{stdout}}" stderr="{{stderr}}" readonly="{{readonly}}" windows="{{windows}}"></docker-attach>
+		<div id="terminal"></div>
+	</template>
+</dom-module>
+
+<script>
+	Polymer({
+		is: 'docker-attach-terminal',
+		properties: {
+			containerid : {
+				type: String
+			},
+			host: {
+				type: String
+			},
+			term: {
+				type: Object,
+				value: function() {
+					return new Terminal({
+			            cols: 125,
+			            rows: 24,
+			            convertEol: true,
+			            useStyle: true,
+			            cursorBlink: true,
+			            screenKeys: true
+			        });
+				}
+			},
+			logs: {
+				type: Number,
+				value: 0
+			},
+			stream :{
+				type: Number,
+				value: 1
+			},
+			stdin: {
+				type: Number,
+				value: 1
+			},
+			stdout: {
+				type: Number,
+				value: 1
+			},
+			stderr: {
+				type: Number,
+				value: 1
+			},
+			readonly: {
+				type: Boolean,
+				value: false
+			},
+			windows: {
+				type: Boolean,
+				value: false
+			}
+		},
+		listeners: {
+			'docker-attach-message': 'handleReceive'
+		},
+
+		ready: function() {
+			//this.$.attach.open();			
+			if (!this.readonly)
+			{
+				var that = this;
+				this.term.on('data', function(data) {	  
+	            	if(that.windows && data == '') { 
+	            		//Backspace	in windows
+	            		that.$.attach.send(unescape('%08'));
+	            	} else {
+	            		that.$.attach.send(data);	
+	            	}
+	          	});
+			}
+
+			this.term.open(this.$.terminal);
+		},
+		attached: function() {
+			if(!this.readonly)
+			{
+
+			}
+		},
+		
+		handleReceive: function(e) {
+			this.term.write(e.detail.data);			
+		}
+
+
+	});
+</script>

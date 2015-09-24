@@ -65,7 +65,11 @@
 
     [flex] {
         @apply(--layout-flex);
-      }
+    }
+
+    [horizontal] {
+        @apply(--layout-horizontal);
+    }
 
     .fab {
         color: white;
@@ -115,9 +119,15 @@
 
         <!-- Main Content -->
         <div class="content">
-          <div style="padding: 10px;">
-           <h4>Management Console</h4>
-        	 <docker-attach host="192.168.0.31:4243" containerid="db8b4274a4dd"></docker-attach>
+          <div horizontal>
+            <div style="padding: 30px;">
+             <h4>Management Console</h4>
+          	 <docker-attach host="127.0.0.1:4243" containerid="d2d7e7b23d08"></docker-attach>
+            </div>
+            <div style="padding: 30px;">
+              <h4>Events</h4>
+              <docker-attach host="127.0.0.1:4243" rows="50" cols="85" command="docker events" containerid="9ddc1c7b0772" readonly></docker-attach>
+            </div>
           </div>
         </div>
 
