@@ -11,7 +11,9 @@
 <link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../paper-styles/demo-pages.html">
 <link rel="import" href="../paper-fab/paper-fab.html">
-<link rel="import" href="../docker-attach/docker-attach.html">
+<link rel="import" href="../docker-attach/docker-attach-terminal.html">
+<link rel="import" href="../docker-ps/docker-ps.html">
+<link rel="import" href="../docker-events-signal/docker-events-signal.html">
 
 <dom-module id="docker-ui">
   <template>
@@ -92,6 +94,8 @@
     }
 
     </style>  
+    <docker-ps id="dockerps" host="127.0.0.1:4243" result="{{psresult}}" auto></docker-ps>
+    <docker-events-signal host="127.0.0.1:4243" containerid="1b2fd6af1563"></docker-events-signal>
     <paper-drawer-panel id="drawerPanel" drawer-width="200px" responsive-width="980px">
       <div class="nav" drawer>
       	<paper-toolbar></paper-toolbar>
@@ -100,9 +104,10 @@
 		    <div class="navsection">
 	      <h4>Containers</h4>
 	      <div class="horizontal-section">
-	        <paper-menu class="list">	          
-		          <paper-item>Januar</paper-item>
-              <paper-item>Wayong</paper-item>
+	        <paper-menu class="list">
+              <template is="dom-repeat" items="{{psresult}}">
+                <paper-item>{{item.Names.0}}</paper-item>          
+		          </template>
 	        </paper-menu>
 	      </div>
 	    </div>
@@ -122,11 +127,11 @@
           <div horizontal>
             <div style="padding: 30px;">
              <h4>Management Console</h4>
-          	 <docker-attach host="127.0.0.1:4243" containerid="d2d7e7b23d08"></docker-attach>
+          	 <docker-attach-terminal host="127.0.0.1:4243" containerid="e9cc44fb65cd"></docker-attach-terminal>
             </div>
             <div style="padding: 30px;">
               <h4>Events</h4>
-              <docker-attach host="127.0.0.1:4243" rows="50" cols="85" command="docker events" containerid="9ddc1c7b0772" readonly></docker-attach>
+              <docker-attach-terminal host="127.0.0.1:4243" rows="50" cols="85" containerid="1b2fd6af1563" readonly></docker-attach-terminal>
             </div>
           </div>
         </div>
@@ -142,6 +147,20 @@
     Polymer({
 
       is: 'docker-ui',
+      properties: {
+        psresult: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return [];
+          }
+        }
+      },
+      listeners: {'docker-event': 'handleDockerEvent'},
+
+      handleDockerEvent: function(e) {
+        this.$.dockerps.go();
+      },
 
   	  showAddFsForm: function() {
   	  	this.$.fsadd.open();

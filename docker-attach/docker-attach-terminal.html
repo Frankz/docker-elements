@@ -4,12 +4,6 @@
 
 <dom-module id="docker-attach-terminal">
 	<template>
-		<style>
-		#terminal {
-			overflow-y: auto;
-			height:600px;
-		}
-		</style>
 		<docker-attach id="attach" containerid="{{containerid}}" host="{{host}}" logs="{{logs}}" stream="{{stream}}" stdin="{{stdin}}" stdout="{{stdout}}" stderr="{{stderr}}" readonly="{{readonly}}" windows="{{windows}}"></docker-attach>
 		<div id="terminal"></div>
 	</template>
@@ -26,17 +20,15 @@
 				type: String
 			},
 			term: {
-				type: Object,
-				value: function() {
-					return new Terminal({
-			            cols: 125,
-			            rows: 24,
-			            convertEol: true,
-			            useStyle: true,
-			            cursorBlink: true,
-			            screenKeys: true
-			        });
-				}
+				type: Object
+			},
+			rows: {
+				type: Number,
+				value: 24
+			},
+			cols: {
+				type: Number,
+				value: 125
 			},
 			logs: {
 				type: Number,
@@ -65,6 +57,10 @@
 			windows: {
 				type: Boolean,
 				value: false
+			},
+			command: {
+				type: String,
+				value: ''
 			}
 		},
 		listeners: {
@@ -72,7 +68,15 @@
 		},
 
 		ready: function() {
-			//this.$.attach.open();			
+			this.term = new Terminal({
+	            cols: this.cols,
+	            rows: this.rows,
+	            convertEol: true,
+	            useStyle: true,
+	            cursorBlink: true,
+	            screenKeys: true
+			});
+
 			if (!this.readonly)
 			{
 				var that = this;
@@ -88,17 +92,16 @@
 
 			this.term.open(this.$.terminal);
 		},
-		attached: function() {
-			if(!this.readonly)
-			{
 
+		attached: function() {
+			if (this.command != '') {
+				this.term.write(this.command+"\n");
 			}
 		},
 		
 		handleReceive: function(e) {
 			this.term.write(e.detail.data);			
 		}
-
 
 	});
 </script>
