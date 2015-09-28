@@ -10,9 +10,9 @@
     "globals"
   ],
   "keywords": [
-    "docker-elements",
-    "polymer",
-    "webcomponents"
+    "web-components",
+    "docker",
+    "polymer"
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.0.0",

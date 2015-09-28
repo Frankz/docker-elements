@@ -23,8 +23,7 @@
 		},
 
 		handleReceive: function(e) {
-			this.fire('docker-event',{data: e.detail.data});
-			console.log('event received');	
+			this.fire('docker-event',{data: e.detail.data});	
 		}
 	});
 </script>
