@@ -58,7 +58,7 @@
 			'message': 'handleReceive'
 		},
 		computeUrl: function(host, containerid) {
-			return "ws://" + host +"/containers/" + containerid + "/attach/ws?logs="+this.logs+"&stream="+this.stream+"&stdin="+this.stdin+"&stdout="+this.stdout+"&stderr="+this.stderr;
+			return host +"/containers/" + containerid + "/attach/ws?logs="+this.logs+"&stream="+this.stream+"&stdin="+this.stdin+"&stdout="+this.stdout+"&stderr="+this.stderr;
 		},
 
 		open: function() {

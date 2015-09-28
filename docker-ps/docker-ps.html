@@ -71,7 +71,7 @@
 				since = this.since != '' ? ("&since="+this.since) : '',
 				limit = this.limit > 0 ? ("&limit=" + this.limit) : '';
 
-			return "http://" + host +"/containers/json?all="+all+"&size="+size+"&filters="+JSON.stringify(this.filters)+before+since+limit;
+			return host +"/containers/json?all="+all+"&size="+size+"&filters="+JSON.stringify(this.filters)+before+since+limit;
 			
 		},
 		handleResponse: function(e) {
