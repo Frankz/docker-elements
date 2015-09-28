@@ -1,0 +1,55 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-top">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse"></iron-ajax auto="{{auto}}">
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-top',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			containerid: {
+				type: String
+			}
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true,
+				value: function() {
+					return [];
+				}
+			},
+			psargs: {
+				type: String,
+				value: ''
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,containerid,psargs)'
+			},
+		},
+		computeUrl: function(host,containerid,psargs) {
+			var url = host +"/containers/"+containerid+"/top";
+			if (psargs != '') {
+				return url + "?ps_args=" + psargs;
+			} else {
+				return url;
+			}
+		},
+		handleResponse: function(e) {
+			this.fire('docker-top-'+this.containerid,{data: e.detail.response});
+		},
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>
