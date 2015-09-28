@@ -1,0 +1,31 @@
+{
+  "name": "docker-elements",
+  "version": "0.5.0",
+  "authors": [
+    "KapalHQ"
+  ],
+  "description": "Docker Elements via Polymer",
+  "main": "docker-ps/docker-ps.html",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "docker-elements",
+    "polymer",
+    "webcomponents"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.0.0",
+    "x-websocket": "https://github.com/jwayong/x-websocket.git#^1.1.0"
+  },
+  "devDependencies": {
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },  
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ]
+}
