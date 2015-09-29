@@ -10,6 +10,7 @@
     "globals"
   ],
   "keywords": [
+    "web-component",
     "web-components",
     "docker",
     "polymer"
