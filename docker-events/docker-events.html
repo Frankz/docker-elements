@@ -1,50 +1,35 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
 
-<dom-module id="docker-ps">
+<dom-module id="docker-events">
 	<template>
 		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
 	</template>
 </dom-module>
 <script>
 	Polymer({
-		is: 'docker-ps',
+		is: 'docker-events',
 		properties: {
 			auto: {
 				type: Boolean,
 				value: false
-			},
-			all: {
-				type: Boolean,
-				value: false,
-				notify: true
-			},
-			size: {
-				type: Boolean,
-				value: false,
-				notify: true
-			},
+			},			
 			since: {
 				type: String,
 				value: '',
 				notify: true
 			},
-			before: {
+			until: {
 				type: String,
 				value: '',
 				notify: true
-			},
-			limit: {
-				type: Number,
-				notify: true,
-				value: 0
-			},
+			},			
 			filters: {
 				type: Object,
 				notify: true,
 				value: function() {
 					return {
-						//"label": ["foo"] --Example of label filter
+						//"event": ["foo"] --Example of event filter
 					};
 				}
 			},
@@ -60,22 +45,19 @@
 			},
 			url: {
   				type: String,
-  				computed: 'computeUrl(host,all,size,since,before,limit,filters)'
+  				computed: 'computeUrl(host,since,until,filters)'
 			},
 		},
-		computeUrl: function(host,_all,_size,_since,_before,_limit,_filters) {
+		computeUrl: function(host,_since,_until,_filters) {
 			
-			var all = this.all ? 1 : 0,
-				size = this.size ? 1 : 0,
-				before = this.before != '' ? ("&before="+this.before) : '',
-				since = this.since != '' ? ("&since="+this.since) : '',
-				limit = this.limit > 0 ? ("&limit=" + this.limit) : '';
+			var until = this.until != '' ? ("&until="+this.until) : '',
+				since = this.since != '' ? ("&since="+this.since) : '';			
 
-			return host +"/containers/json?all="+all+"&size="+size+"&filters="+JSON.stringify(this.filters)+before+since+limit;
+			return host +"/events?filters="+JSON.stringify(this.filters)+until+since;
 			
 		},
 		handleResponse: function(e) {
-			this.fire('docker-ps-message',{data: e.detail.response});
+			this.fire('docker-events-message',{data: e.detail.response});
 		},
 		handleError: function(e) {
 			this.fire('docker-error',{data: e.detail.error});

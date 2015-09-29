@@ -1,0 +1,51 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-stats">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-stats',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			containerid: {
+				type: String
+			},
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true
+			},
+			stream: {
+				type: Boolean,
+				value: false //Currently will not work with Stream
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,containerid,stream)'
+			}
+		},
+		computeUrl: function(host,containerid,stream) {
+			return host +"/containers/"+containerid+"/stats?stream="+(stream ? 1 : 0);
+			
+		},
+		handleResponse: function(e) {
+			this.fire('docker-stats-'+this.containerid,{data: e.detail.response});
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},		
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>

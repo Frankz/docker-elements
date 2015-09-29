@@ -1,0 +1,43 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-version">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-version',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},						
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host)'
+			},
+		},
+		computeUrl: function(host) {		
+			return host +"/version";			
+		},
+		handleResponse: function(e) {
+			this.fire('docker-version-message',{data: e.detail.response});
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},		
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>

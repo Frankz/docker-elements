@@ -3,7 +3,7 @@
 
 <dom-module id="docker-changes">
 	<template>
-		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse"></iron-ajax auto="{{auto}}">
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
 	</template>
 </dom-module>
 <script>
@@ -16,7 +16,7 @@
 			},
 			containerid: {
 				type: String
-			}
+			},
 			host: {
 				type: String
 			},
@@ -38,9 +38,11 @@
 		handleResponse: function(e) {
 			this.fire('docker-changes-'+this.containerid,{data: e.detail.response});
 		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},		
 		go: function() {
 			this.$.ajax.generateRequest();
 		}
-
 	})
 </script>
