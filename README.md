@@ -10,7 +10,7 @@ bower install docker-elements
 ```
 
 ## Elements in Progress
-* `docker-create` : Create container
+* `docker-commit` : Commit container
 * `docker-container` : UI element to manage a container from a single element that aggregates all container operations
 
 ## Docker Host Elements Implemented
@@ -20,7 +20,7 @@ bower install docker-elements
 * `docker-ping`: Ping the docker server
 
 ## Docker Container Elements Implemented
-
+* `docker-create`: Provides API for creating container
 * `docker-ps`: Provides API with listing docker containers
 * `docker-attach`: Provides Web Socket connections to docker container using the Docker API
 * `docker-attach-terminal`: UI Terminal Element that uses docker-attach
@@ -53,5 +53,5 @@ bower install docker-elements
 * `docker-copy` : Copy files from a container that returns a tar stream
 * `docker-archive` : Get an tar archive of a resource in the filesystem of container
 * `docker-push`: Push Container to the registry
-* `docker-exec` : Docker exec
-* `docker-commit` : Commit container
+* `docker-exec` : Docker exec, this might get delayed until websocket is available from Docker API for exec.
+
