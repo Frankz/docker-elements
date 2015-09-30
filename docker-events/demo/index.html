@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Docker events demo</title>
+		<script src="../../../webcomponentsjs/webcomponents-lite.min.js"></script>
+		<link rel="import" href="../docker-events.html">
+	</head>
+	<body>
+			
+	  <template id="t" is="dom-bind">
+	    <docker-events host="http://127.0.0.1:4243" result="{{result}}" auto></docker-events>
+	    <div>Result</div>
+		<template is="dom-repeat" items="{{result}}">
+	    	<div><span>{{item.from}}</span>,<span>{{item.id}}</span>,<span>{{item.status}}</span>,<span>{{item.time}}</span></div>
+	    </template> 	    	    
+	  </template>			
+	</body>
+</html>
