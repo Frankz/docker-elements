@@ -3,7 +3,7 @@
 
 <dom-module id="docker-events">
 	<template>
-		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="text" method="GET" last-request="{{request}}" on-request="handleRequest" on-response="handleResponse" on-response="handleResponse" on-error="handleError"></iron-ajax>
 	</template>
 </dom-module>
 <script>
@@ -38,10 +38,11 @@
 			},
 			result: {
 				type: Object,
-				notify: true,
-				value: function() {
-					return [];
-				}
+				notify: true
+			},
+			request: {
+				type: Object,
+				notify: true
 			},
 			url: {
   				type: String,
@@ -57,6 +58,7 @@
 			
 		},
 		handleResponse: function(e) {
+			this.result = e.detail.response;
 			this.fire('docker-events-message',{data: e.detail.response});
 		},
 		handleError: function(e) {
@@ -64,7 +66,21 @@
 		},		
 		go: function() {
 			this.$.ajax.generateRequest();
+		},
+		handleRequest: function(e) {
+			var that = this;
+			this.request.xhr.addEventListener('progress', function (progress) {
+				var eventsText = that.request.xhr.responseText.split('\n');
+				var events = eventsText.map(function(x){
+					if(x != "")
+						return JSON.parse(x);
+				});
+				
+		    	that.result = events.filter(function(x) {
+		    		return x != undefined;
+		    	});
+		    });
+			
 		}
-
 	})
 </script>
