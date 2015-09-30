@@ -34,7 +34,7 @@ bower install docker-elements
 * `docker-resize` : Resize container TTY
 * `docker-restart` : Restart a container
 * `docker-start` : Start a container
-* `docker-stats` : Get container stats, stream is currently NOT supported
+* `docker-stats` : Get container stats, Stream is now Supported
 * `docker-stop` : Stop docker container
 * `docker-top` : Get Processes info in a container
 * `docker-unpause` : Unpause a container

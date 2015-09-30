@@ -3,7 +3,7 @@
 
 <dom-module id="docker-logs">
 	<template>
-		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" method="GET" handle-as="text" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" method="GET" handle-as="text" last-request="{{request}}" on-request="handleRequest" on-response="handleResponse" on-error="handleError"></iron-ajax>
 	</template>
 </dom-module>
 <script>
@@ -40,16 +40,24 @@
 				type: String, /*All or A Number*/
 				value: ''
 			},
+			follow: {
+				type: Boolean,
+				value: false
+			},
 			result: {
+				type: Object,
+				notify: true
+			},
+			request: {
 				type: Object,
 				notify: true
 			},
 			url: {
   				type: String,
-  				computed: 'computeUrl(host,containerid,stdout,stderr,since,timestamps,tail)'
+  				computed: 'computeUrl(host,containerid,stdout,stderr,since,timestamps,tail,follow)'
 			},
 		},
-		computeUrl: function(host,containerid,_stdout,_stderr,_since,_timestamps,_tail) {
+		computeUrl: function(host,containerid,_stdout,_stderr,_since,_timestamps,_tail,follow) {
 			
 			var stdout = this.stdout ? 1 : 0,
 				stderr = this.stderr ? 1 : 0,
@@ -57,17 +65,26 @@
 				timestamps = this.timestamps ? ("&timestamps=1") : '',
 				tail = this.tail != '' ? ("&tail=" + this.tail) : '';
 
-			return host +"/containers/"+containerid+"/logs?stdout="+stdout+"&stderr="+stderr+since+timestamps+tail;
+			return host +"/containers/"+containerid+"/logs?follow="+follow+"&stdout="+stdout+"&stderr="+stderr+since+timestamps+tail;
 			
 		},
 		handleResponse: function(e) {
-			this.fire('docker-logs-'+this.containerid,{data: e.detail.response});			
+			this.result = e.detail.response;
+			this.fire('docker-logs-'+this.containerid,{data: e.detail.response});
 		},
 		handleError: function(e) {
 			this.fire('docker-error',{data: e.detail.error});
 		},
 		go: function() {
 			this.$.ajax.generateRequest();
+		},
+		handleRequest: function(e) {
+			if(this.follow) {
+				var that = this;
+				this.request.xhr.addEventListener('progress', function (progress) {
+			    	that.result = that.request.xhr.responseText;
+			    });
+			}
 		}
 
 	})

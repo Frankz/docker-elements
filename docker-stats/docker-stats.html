@@ -3,7 +3,7 @@
 
 <dom-module id="docker-stats">
 	<template>
-		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="text" method="GET" last-request="{{request}}" on-request="handleRequest" on-response="handleResponse" on-error="handleError"></iron-ajax>
 	</template>
 </dom-module>
 <script>
@@ -24,6 +24,10 @@
 				type: Object,
 				notify: true
 			},
+			request: {
+				type: Object,
+				notify: true
+			},	
 			stream: {
 				type: Boolean,
 				value: false //Currently will not work with Stream
@@ -38,6 +42,7 @@
 			
 		},
 		handleResponse: function(e) {
+			this.result = e.detail.response;
 			this.fire('docker-stats-'+this.containerid,{data: e.detail.response});
 		},
 		handleError: function(e) {
@@ -45,7 +50,14 @@
 		},		
 		go: function() {
 			this.$.ajax.generateRequest();
+		},
+		handleRequest: function(e) {
+			if(this.stream) {
+				var that = this;
+				this.request.xhr.addEventListener('progress', function (progress) {
+			    	that.result = that.request.xhr.responseText;
+			    });
+			}
 		}
-
 	})
 </script>
