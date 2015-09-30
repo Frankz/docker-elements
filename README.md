@@ -27,14 +27,14 @@ bower install docker-elements
 * `docker-changes`: Analyze file changes within the container
 * `docker-inspect`: Inspect a container
 * `docker-kill`: Kill a container
-* `docker-logs`: Get container log, stream is currently NOT supported
+* `docker-logs`: Get container log, stream is now supported
 * `docker-pause`: Pause a container
 * `docker-remove` : Remove/delete a container
 * `docker-rename` : Rename a container
 * `docker-resize` : Resize container TTY
 * `docker-restart` : Restart a container
 * `docker-start` : Start a container
-* `docker-stats` : Get container stats, Stream is now Supported
+* `docker-stats` : Get container stats, Stream is now supported
 * `docker-stop` : Stop docker container
 * `docker-top` : Get Processes info in a container
 * `docker-unpause` : Unpause a container
