@@ -1,0 +1,304 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-create">
+	<template>
+		<iron-ajax id="ajax" url="{{url}}" handle-as="json" method="POST" body="{{requestBody}}" content-type="application/json" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-create',
+		properties: {
+			host: {
+				type: String,
+				notify: true
+			},
+			name: {
+				type: String,
+				notify: true
+			},			
+			requestBody: {
+				type: Object,
+				value: function() {
+					return {};
+				},
+				notify: true
+			},
+			result: {
+				type: Object,
+				notify: true
+			},	
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,name)'
+			},
+			hostname: {
+				type: String,
+				notify: true
+			},
+
+			domainName: {
+				type: String,
+				notify: true
+			},
+			user: {
+				type: String,
+				notify: true
+			},
+			attachStdin: {
+				type: Boolean,
+				notify: true
+			},
+			attachStdout: {
+				type: Boolean,
+				notify: true
+			},
+			attachStderr: {
+				type: Boolean,
+				notify: true
+			},
+			tty: {
+				type: Boolean,
+				notify: true
+			},
+			openStdin: {
+				type: Boolean,
+				notify: true
+			},
+			stdinOnce: {
+				type: Boolean,
+				notify: true
+			},
+			env: {
+				type: Array,
+				notify: true
+			},
+			cmd: {
+				type: Array,
+				notify: true
+			},
+			entryPoint: {
+				type: String,
+				notify: true
+			},
+			image: {
+				type: String,
+				notify: true
+			},
+			labels: {
+				type: Object,
+				notify: true
+			},
+			mounts: {
+				type: Array,
+				notify: true		
+			},
+			workingDir: {
+				type: String,
+				notify: true
+			},
+			networkDisabled: {
+				type: Boolean,
+				notify: true
+			},
+			macAddress: {
+				type: String,
+				notify: true
+			},
+			exposedPorts: {
+				type: Object,
+				notify: true
+			},
+			hostConfig: {
+				type: Object,
+				value: function() {
+					return {};
+				},
+				notify: true
+			},
+			binds: {
+				type: Array,
+				notify: true
+			},
+			links: {
+				type: Array,
+				notify: true
+			},
+			lxcConf: {
+				type: Object,
+				notify: true
+			},
+			memory: {
+				type: Number,
+				notify: true			
+			},
+			memorySwap: {
+				type: Number,
+				notify: true
+			},
+			cpuShares: {
+				type: Number,
+				notify: true				
+			},
+
+			cpuPeriod: {
+				type: Number,
+				notify: true				
+			},
+			cpusetCpus: {
+				type: String,
+				notify: true				
+			},
+			cpusetMems: {
+				type: String,
+				notify: true				
+			},
+			blkioWeight: {
+				type: Number,
+				notify: true
+			},
+			memorySwappiness: {
+				type: Number,
+				notify: true
+			},
+			oomKillDisable: {
+				type: Boolean,
+				notify: true
+			},
+			portBindings: {
+				type: Object,
+				notify: true
+			},
+			publishAllPorts: {
+				type: Boolean,
+				notify: true
+			},
+			privileged: {
+				type: Boolean,
+				notify: true
+			},
+			readonlyRootfs:{
+				type: Boolean,
+				notify: true				
+			},
+			dns: {
+				type: Array,
+				notify: true
+			},
+			dnsSearch: {
+				type: Array,
+				notify: true
+			},
+			extraHosts: {
+				type: Array,
+				notify: true
+			},
+			volumesFrom: {
+				type: Array,
+				notify: true
+			},
+			capAdd: {
+				type: Array,
+				notify: true
+			},
+			capDrop: {	
+				type: Array,
+				notify: true
+			},
+			restartPolicy: {
+				type: Object,
+				notify: true
+			},
+			networkMode: {
+				type: String,
+				notify: true
+			},
+			devices: {
+				type: Array,
+				notify: true
+			},
+			ulimits: {
+				type: Object,
+				notify: true
+			},
+			logConfig: {
+				type: Object,
+				notify: true
+			},
+			securityOpts: {
+				type: Array,
+				notify: true
+			},
+			cgroupParent: {
+				type: String,
+				notify: true
+			}
+		},
+		computeUrl: function(host,name) {
+			return host +"/containers/create"+(name != undefined ? '?name=' + name : '');			
+		},
+		handleResponse: function(e) {
+			this.fire('docker-create',{data: e.detail});
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},
+		setBody: function(){
+			if (this.hostName != undefined) { this.requestBody.Hostname = this.hostName } ;
+			if (this.domainName != undefined) { this.requestBody.Domainname = this.domainName } ;
+			if (this.user != undefined) { this.requestBody.User = this.user } ;
+			if (this.attachStdin != undefined) { this.requestBody.AttachStdin = this.attachStdin } ;
+			if (this.attachStdout != undefined) { this.requestBody.AttachStdout = this.attachStdout } ;
+			if (this.attachStderr != undefined) { this.requestBody.AttachStderr = this.attachStderr } ;
+			if (this.tty != undefined) { this.requestBody.Tty = this.tty } ;
+			if (this.openStdin != undefined) { this.requestBody.OpenStdin = this.openStdin } ;
+			if (this.stdinOnce != undefined) { this.requestBody.StdinOnce = this.stdinOnce } ;
+			if (this.env != undefined) { this.requestBody.Env = this.env } ;
+			if (this.cmd != undefined) { this.requestBody.Cmd = this.cmd } ;
+			if (this.entryPoint != undefined) { this.requestBody.Entrypoint = this.entryPoint } ;
+			if (this.image != undefined) { this.requestBody.Image = this.image } ;
+			if (this.labels != undefined) { this.requestBody.Labels = this.labels } ;
+			if (this.mounts != undefined) { this.requestBody.Mounts = this.mounts } ;
+			if (this.workingDir != undefined) { this.requestBody.WorkingDir = this.workingDir } ;
+			if (this.networkDisabled != undefined) { this.requestBody.NetworkDisabled = this.networkDisabled } ;
+			if (this.macAddress != undefined) { this.requestBody.MacAddress = this.macAddress } ;
+			if (this.exposedPorts != undefined) { this.requestBody.ExposedPorts = this.exposedPorts } ;
+
+			//Set HostConfig
+			if (this.binds != undefined) { this.hostConfig.Binds = this.binds } ;
+			if (this.links != undefined) { this.hostConfig.Links = this.links } ;
+			if (this.lxcConf != undefined) { this.hostConfig.LxcConf = this.lxcConf } ;
+			if (this.memory != undefined) { this.hostConfig.Memory = this.memory } ;
+			if (this.memorySwap != undefined) { this.hostConfig.MemorySwap = this.memorySwap } ;
+			if (this.cpuShares != undefined) { this.hostConfig.CpuShares = this.cpuShares } ;
+			if (this.cpusetCpus != undefined) { this.hostConfig.CpusetCpus = this.cpusetCpus } ;
+			if (this.cpusetMems != undefined) { this.hostConfig.CpusetMems = this.cpusetMems } ;
+			if (this.blkioWeight != undefined) { this.hostConfig.BlkioWeight = this.blkioWeight } ;
+			if (this.memorySwappiness != undefined) { this.hostConfig.MemorySwappiness = this.memorySwappiness } ;
+			if (this.oomKillDisable != undefined) { this.hostConfig.OomKillDisable = this.oomKillDisable } ;
+			if (this.portBindings != undefined) { this.hostConfig.PortBindings = this.portBindings } ;
+			if (this.publishAllPorts != undefined) { this.hostConfig.PublishAllPorts = this.publishAllPorts } ;
+			if (this.privileged != undefined) { this.hostConfig.Privileged = this.privileged } ;
+			if (this.readonlyRootfs != undefined) { this.hostConfig.ReadonlyRootfs = this.readonlyRootfs } ;
+			if (this.dns != undefined) { this.hostConfig.Dns = this.dns } ;
+			if (this.dnsSearch != undefined) { this.hostConfig.DnsSearch = this.dnsSearch } ;
+			if (this.volumesFrom != undefined) { this.hostConfig.VolumesFrom = this.volumesFrom } ;
+			if (this.capAdd != undefined) { this.hostConfig.CapAdd = this.capAdd } ;
+			if (this.restartPolicy != undefined) { this.hostConfig.RestartPolicy = this.restartPolicy } ;
+			if (this.networkMode != undefined) { this.hostConfig.NetworkMode = this.networkMode } ;
+			if (this.devices != undefined) { this.hostConfig.Devices = this.devices } ;
+			if (this.ulimits != undefined) { this.hostConfig.Ulimits = this.ulimits } ;
+			if (this.logConfig != undefined) { this.hostConfig.LogConfig = this.logConfig } ;
+			if (this.securityOpt != undefined) { this.hostConfig.SecurityOpt = this.securityOpt } ;
+			if (this.cgroupParent != undefined) { this.hostConfig.CgroupParent = this.cgroupParent } ;
+
+			this.requestBody.HostConfig = this.hostConfig;
+		},
+		go: function() {
+			this.setBody();
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>
