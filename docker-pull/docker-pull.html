@@ -3,7 +3,7 @@
 
 <dom-module id="docker-pull">
 	<template>
-		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="POST" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="text" method="POST" last-request="{{request}}" on-request="handleRequest" on-response="handleResponse" on-error="handleError"></iron-ajax>
 	</template>
 </dom-module>
 <script>
@@ -18,6 +18,15 @@
 				type: String
 			},
 			result: {
+				type: Object,
+				notify: true
+			},
+			done: {
+				type: Boolean,
+				value: false,
+				notify: true
+			},
+			request: {
 				type: Object,
 				notify: true
 			},
@@ -46,13 +55,37 @@
 			return host +"/images/create?fromImage="+image+(repo != '' ? "&repo="+ repo : '')+(tag != '' ? "&tag="+ tag : '')+(registry != '' ? "&registry="+ registry : '');
 		},
 		handleResponse: function(e) {
+			this.done = true;
 			this.fire('docker-pull-'+this.containerid,{data: e.detail.response});
 		},
 		handleError: function(e) {
 			this.fire('docker-error',{data: e.detail.error});
-		},		
+		},
 		go: function() {
 			this.$.ajax.generateRequest();
+		},
+		handleRequest: function(e) {
+			var that = this;
+			this.request.xhr.addEventListener('progress', function (progress) {
+				var lines = that.request.xhr.responseText.split('\n');
+				var linesProgress = lines.map(function(x){
+					  if(x.indexOf('{"errorDetail"') > -1) {
+							var statuses = x.split('{"errorDetail"');
+							return '{"errorDetail"' + statuses[statuses.length-1];
+						} else {
+							var statuses = x.split('{"status"');
+							return '{"status"' + statuses[statuses.length-1];
+						}
+
+				});
+
+	    	jsonStrLines = linesProgress.filter(function(x) {
+	    		return x != undefined && x != '{"status"' && x != '{"errorDetail"';
+	    	});
+				that.result = jsonStrLines.map(function(x){
+					return JSON.parse(x);
+				});
+		  });
 		}
 
 	})

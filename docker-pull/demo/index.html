@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Docker pull demo</title>
+		<script src="../../../webcomponentsjs/webcomponents-lite.min.js"></script>
+		<link rel="import" href="../docker-pull.html">
+	</head>
+	<body>
+
+	  <template id="t" is="dom-bind">
+	    <docker-pull host="http://192.168.0.31:4243" result="{{result}}" done="{{done}}" image="busybox" auto></docker-pull>
+	    <div>Result</div><br/>
+			<template is="dom-repeat" items="{{result}}">
+					<div><span>{{item.error}}</span><span>{{item.id}}</span>&nbsp;<span>{{item.status}}</span>&nbsp;<span>{{item.progress}}</span></div>
+			</template>
+			<br/>
+			<div>Overall Pull Status Download: <span>{{done}}</span></div>
+	  </template>
+	</body>
+</html>
