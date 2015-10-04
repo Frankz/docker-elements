@@ -40,7 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			
 			<docker-pull host="http://127.0.0.1:4243" result="{{pullresult}}" done="{{pullDone}}" image="jess/visualstudio" tag="latest" auto=""></docker-pull>
 
-			<docker-create start="{{pullDone}}" host="http://127.0.0.1:4243" result="{{result}}" mounts="[{&quot;Source&quot;: &quot;/tmp/.X11-unix&quot;, &quot;Destination&quot;:&quot;/tmp/.X11-unix&quot;, &quot;Mode&quot;: &quot;&quot;, &quot;RW&quot;:true}]" binds="[&quot;/tmp/.X11-unix:/tmp/.X11-unix&quot;]" name="visualstudio2" env="[&quot;DISPLAY=unix:0&quot;]" devices="[{ &quot;PathOnHost&quot;: &quot;/dev/dri&quot;, &quot;PathInContainer&quot;: &quot;/dev/dri&quot;, &quot;CgroupPermissions&quot;: &quot;rwm&quot;}]" image="jess/visualstudio" containerid="{{containerid}}" done="{{createDone}}"></docker-create>
+			<docker-create start="{{pullDone}}" host="http://127.0.0.1:4243" result="{{result}}" mounts="[{&quot;Source&quot;: &quot;/tmp/.X11-unix&quot;, &quot;Destination&quot;:&quot;/tmp/.X11-unix&quot;, &quot;Mode&quot;: &quot;&quot;, &quot;RW&quot;:true}]" binds="[&quot;/tmp/.X11-unix:/tmp/.X11-unix&quot;]" name="visualstudio2" env="[&quot;DISPLAY=unix:0&quot;]" image="jess/visualstudio" containerid="{{containerid}}" done="{{createDone}}"></docker-create>
 
 			<docker-start host="http://127.0.0.1:4243" result="{{result}}" containerid="{{containerid}}" start="{{createDone}}" done="{{startDone}}"></docker-start>
 
