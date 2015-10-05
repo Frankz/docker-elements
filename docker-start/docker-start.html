@@ -14,6 +14,17 @@
 				type: Boolean,
 				value: false
 			},
+			start: {
+				type: Boolean,
+				notify: true,
+				value: false,
+				observer: '_startChanged'
+			},
+			done: {
+				type: Boolean,
+				notify: true,
+				value: false
+			},
 			containerid: {
 				type: String
 			},
@@ -29,16 +40,22 @@
   				computed: 'computeUrl(host,containerid)'
 			}
 		},
+		_startChanged: function(newValue, oldValue) {
+    	if(newValue && !oldValue) {
+				this.go();
+			}
+  	},
 		computeUrl: function(host,containerid) {
 			return host +"/containers/"+containerid+"/start";
-			
+
 		},
 		handleResponse: function(e) {
 			this.fire('docker-start-'+this.containerid,{data: e.detail});
+			this.done = true;
 		},
 		handleError: function(e) {
 			this.fire('docker-error',{data: e.detail.error});
-		},		
+		},
 		go: function() {
 			this.$.ajax.generateRequest();
 		}

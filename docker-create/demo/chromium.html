@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Docker Chromium demo</title>
+		<script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+		<link rel="import" href="../../docker-pull/docker-pull.html">
+		<link rel="import" href="../docker-create.html">
+		<link rel="import" href="../../docker-start/docker-start.html">
+	</head>
+	<body>
+
+	  <template id="t" is="dom-bind">
+
+
+			<!--Configure - This is da Juice-->
+      <!--
+			<docker-pull host="http://127.0.0.1:4243" result="{{pullresult}}" done="{{pullDone}}" image="jess/chromium" tag="latest" auto></docker-pull>
+      -->
+			<docker-create start="{{pullDone}}" host="http://127.0.0.1:4243" result="{{result}}"
+										 mounts='[{"Source": "/tmp/.X11-unix", "Destination":"/tmp/.X11-unix", "Mode": "", "RW":true}]'
+										 binds='["/tmp/.X11-unix:/tmp/.X11-unix"]'
+										 env='["DISPLAY=unix:0"]'
+										 image="jess/chromium"
+										 containerid="{{containerid}}"
+										 done="{{createDone}}" auto></docker-create>
+
+			<docker-start host="http://127.0.0.1:4243" result="{{result}}" containerid="{{containerid}}" start="{{createDone}}" done="{{startDone}}"></docker-start>
+
+
+
+			<!-- Print Result -->
+			<template is="dom-repeat" items="{{pullresult}}">
+					<div><span>{{item.error}}</span><span>{{item.id}}</span>&nbsp;<span>{{item.status}}</span>&nbsp;<span>{{item.progress}}</span></div>
+			</template>
+			<div>Pull Status Done: <span>{{pullDone}}</span></div>
+			<div>Container Created: <span>{{createDone}}</span>&nbsp;<span>{{containerid}}</span></div>
+			<div>Start Container: <span>{{startDone}}</span></div>
+
+	  </template>
+	</body>
+</html>

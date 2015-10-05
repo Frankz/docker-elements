@@ -3,21 +3,42 @@
 
 <dom-module id="docker-create">
 	<template>
-		<iron-ajax id="ajax" url="{{url}}" handle-as="json" method="POST" body="{{requestBody}}" content-type="application/json" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+		<iron-ajax id="ajax"  url="{{url}}" handle-as="json" method="POST" body="{{requestBody}}" content-type="application/json" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
 	</template>
 </dom-module>
 <script>
 	Polymer({
 		is: 'docker-create',
 		properties: {
+			auto: {
+				type: Boolean,
+				notify: true,
+				value: false
+			},
 			host: {
+				type: String,
+				notify: true
+			},
+			start: {
+				type: Boolean,
+				notify: true,
+				value: false,
+				observer: '_startChanged'
+			},
+			done: {
+				type: Boolean,
+				notify: true,
+				value: false
+			},
+			containerid:{
 				type: String,
 				notify: true
 			},
 			name: {
 				type: String,
-				notify: true
-			},			
+				notify: true,
+				value: ''
+			},
 			requestBody: {
 				type: Object,
 				value: function() {
@@ -28,7 +49,7 @@
 			result: {
 				type: Object,
 				notify: true
-			},	
+			},
 			url: {
   				type: String,
   				computed: 'computeUrl(host,name)'
@@ -92,7 +113,7 @@
 			},
 			mounts: {
 				type: Array,
-				notify: true		
+				notify: true
 			},
 			workingDir: {
 				type: String,
@@ -131,7 +152,7 @@
 			},
 			memory: {
 				type: Number,
-				notify: true			
+				notify: true
 			},
 			memorySwap: {
 				type: Number,
@@ -139,20 +160,20 @@
 			},
 			cpuShares: {
 				type: Number,
-				notify: true				
+				notify: true
 			},
 
 			cpuPeriod: {
 				type: Number,
-				notify: true				
+				notify: true
 			},
 			cpusetCpus: {
 				type: String,
-				notify: true				
+				notify: true
 			},
 			cpusetMems: {
 				type: String,
-				notify: true				
+				notify: true
 			},
 			blkioWeight: {
 				type: Number,
@@ -180,7 +201,7 @@
 			},
 			readonlyRootfs:{
 				type: Boolean,
-				notify: true				
+				notify: true
 			},
 			dns: {
 				type: Array,
@@ -202,7 +223,7 @@
 				type: Array,
 				notify: true
 			},
-			capDrop: {	
+			capDrop: {
 				type: Array,
 				notify: true
 			},
@@ -235,11 +256,23 @@
 				notify: true
 			}
 		},
+		_startChanged: function(newValue, oldValue) {
+    	if(newValue && !oldValue) {
+				this.go();
+			}
+  	},
+		attached: function() {
+			if(this.auto) {
+				this.start = true;
+			}
+		},
 		computeUrl: function(host,name) {
-			return host +"/containers/create"+(name != undefined ? '?name=' + name : '');			
+			return host +"/containers/create"+(name != '' ? '?name=' + name : '');
 		},
 		handleResponse: function(e) {
+			this.containerid = e.detail.response.Id;
 			this.fire('docker-create',{data: e.detail});
+			this.done = true;
 		},
 		handleError: function(e) {
 			this.fire('docker-error',{data: e.detail.error});

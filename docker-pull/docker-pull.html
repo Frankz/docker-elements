@@ -56,7 +56,7 @@
 		},
 		handleResponse: function(e) {
 			this.done = true;
-			this.fire('docker-pull-'+this.containerid,{data: e.detail.response});
+			this.fire('docker-pull-done',{data: e.detail.response});
 		},
 		handleError: function(e) {
 			this.fire('docker-error',{data: e.detail.error});
