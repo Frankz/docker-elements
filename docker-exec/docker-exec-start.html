@@ -1,0 +1,93 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-exec-start">
+	<template>
+		<iron-ajax id="ajax" url="{{url}}" handle-as="text" method="POST" last-response="{{result}}" body="{{requestBody}}" content-type="application/json" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-exec-start',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			start: {
+				type: Boolean,
+				notify: true,
+				value: false,
+				observer: '_startChanged'
+			},
+			done: {
+				type: Boolean,
+				notify: true,
+				value: false
+			},
+      execid: {
+        type: String,
+        notify: true
+      },
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true
+			},
+      requestBody: {
+        type: Object,
+        notify: true,
+        value: function() {
+          return {};
+        }
+      },
+      detach: {
+        type: Boolean,
+        notify: true,
+        value:false
+      },
+      tty: {
+        type: Boolean,
+        notify: true,
+        value: false
+      },
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,execid)'
+			}
+		},
+		_startChanged: function(newValue, oldValue) {
+    	if(newValue && !oldValue) {
+				this.go();
+			}
+  	},
+    attached: function() {
+      if(this.auto) {
+        this.start = true;
+      }
+    },
+    setBody: function() {
+      this.requestBody.Tty = this.tty;
+      this.requestBody.Detach = this.detach;
+    },
+		computeUrl: function(host,execid) {
+			return host +"/exec/"+execid+"/start";
+
+		},
+		handleResponse: function(e) {
+      this.execid = e.detail.response.Id;
+			this.fire('docker-exec-start-'+this.containerid,{data: e.detail.response});
+			this.done = true;
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},
+		go: function() {
+      this.setBody();
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>

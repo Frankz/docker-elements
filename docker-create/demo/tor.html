@@ -9,6 +9,10 @@
 	</head>
 	<body>
 
+
+
+
+
 	  <template id="t" is="dom-bind">
 
 
@@ -16,6 +20,7 @@
 			<!--
 			<docker-pull host="http://127.0.0.1:4243" result="{{pullresult}}" done="{{pullDone}}" image="jess/tor-browser" tag="latest" auto></docker-pull>
 			-->
+			
 			<docker-create start="{{pullDone}}" host="http://127.0.0.1:4243" result="{{result}}"
 										 mounts='[{"Source": "/tmp/.X11-unix", "Destination":"/tmp/.X11-unix", "Mode": "", "RW":true},{"Source": "/dev/snd", "Destination":"/dev/snd", "Mode": "", "RW":true}]'
 										 binds='["/tmp/.X11-unix:/tmp/.X11-unix","/dev/snd:/dev/snd"]'
@@ -25,6 +30,13 @@
 										 done="{{createDone}}" auto></docker-create>
 
 			<docker-start host="http://127.0.0.1:4243" result="{{result}}" containerid="{{containerid}}" start="{{createDone}}" done="{{startDone}}"></docker-start>
+
+
+
+
+
+
+
 
 
 
