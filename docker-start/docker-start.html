@@ -41,10 +41,10 @@
 			}
 		},
 		_startChanged: function(newValue, oldValue) {
-    	if(newValue && !oldValue) {
+    		if(newValue && !oldValue) {
 				this.go();
 			}
-  	},
+  		},
 		computeUrl: function(host,containerid) {
 			return host +"/containers/"+containerid+"/start";
 

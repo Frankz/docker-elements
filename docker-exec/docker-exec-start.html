@@ -25,10 +25,10 @@
 				notify: true,
 				value: false
 			},
-      execid: {
-        type: String,
-        notify: true
-      },
+	        execid: {
+	          type: String,
+	          notify: true
+	        },
 			host: {
 				type: String
 			},
@@ -36,23 +36,23 @@
 				type: Object,
 				notify: true
 			},
-      requestBody: {
-        type: Object,
-        notify: true,
-        value: function() {
-          return {};
-        }
-      },
-      detach: {
-        type: Boolean,
-        notify: true,
-        value:false
-      },
-      tty: {
-        type: Boolean,
-        notify: true,
-        value: false
-      },
+	        requestBody: {
+	          type: Object,
+	          notify: true,
+	          value: function() {
+	            return {};
+	          }
+	        },
+	        detach: {
+	          type: Boolean,
+	          notify: true,
+	          value:false
+	        },
+	        tty: {
+	          type: Boolean,
+	          notify: true,
+	          value: false
+	        },
 			url: {
   				type: String,
   				computed: 'computeUrl(host,execid)'
@@ -62,22 +62,22 @@
     	if(newValue && !oldValue) {
 				this.go();
 			}
-  	},
-    attached: function() {
-      if(this.auto) {
-        this.start = true;
-      }
-    },
-    setBody: function() {
-      this.requestBody.Tty = this.tty;
-      this.requestBody.Detach = this.detach;
-    },
+  		},
+	    attached: function() {
+	      if(this.auto) {
+	        this.start = true;
+	      }
+	    },
+	    setBody: function() {
+	      this.requestBody.Tty = this.tty;
+	      this.requestBody.Detach = this.detach;
+	    },
 		computeUrl: function(host,execid) {
 			return host +"/exec/"+execid+"/start";
 
 		},
 		handleResponse: function(e) {
-      this.execid = e.detail.response.Id;
+      		this.execid = e.detail.response.Id;
 			this.fire('docker-exec-start-'+this.containerid,{data: e.detail.response});
 			this.done = true;
 		},
@@ -85,7 +85,7 @@
 			this.fire('docker-error',{data: e.detail.error});
 		},
 		go: function() {
-      this.setBody();
+      		this.setBody();
 			this.$.ajax.generateRequest();
 		}
 

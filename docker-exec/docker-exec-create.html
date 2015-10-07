@@ -28,10 +28,10 @@
 			containerid: {
 				type: String
 			},
-      execid: {
-        type: String,
-        notify: true
-      },
+	        execid: {
+	          type: String,
+	          notify: true
+	        },
 			host: {
 				type: String
 			},
@@ -39,35 +39,34 @@
 				type: Object,
 				notify: true
 			},
-      requestBody: {
-        type: Object,
-        notify: true,
-        value: function() {
-          return {};
-        }
-      },
-      attachStdin: {
-        type: Boolean,
-        notify: true,
-        value:false
-      },
+	        requestBody: {
+	          type: Object,
+	          notify: true,
+	          value: function() {
+	            return {};
+	          }
+	        },
+	        attachStdin: {
+	          type: Boolean,
+	          notify: true,
+	          value:false
+	        },
 
-      attachStdout: {
-        type: Boolean,
-        notify: true,
-        value: true
-      },
-
-      attachStderr: {
-        type: Boolean,
-        notify: true,
-        value: true
-      },
-      tty: {
-        type: Boolean,
-        notify: true,
-        value: false
-      },
+	        attachStdout: {
+	          type: Boolean,
+	          notify: true,
+	          value: true
+	        },
+	        attachStderr: {
+	          type: Boolean,
+	          notify: true,
+	          value: true
+	        },
+	        tty: {
+	          type: Boolean,
+	          notify: true,
+	          value: false
+	        },
 			cmd: {
 				type: Array,
 				notify: true,
@@ -81,22 +80,22 @@
 			}
 		},
 		_startChanged: function(newValue, oldValue) {
-    	if(newValue && !oldValue) {
+    		if(newValue && !oldValue) {
 				this.go();
 			}
-  	},
-    attached: function() {
-      if(this.auto) {
-        this.start = true;
-      }
-    },
-    setBody: function() {
-      this.requestBody.AttachStdin = this.attachStdin;
-      this.requestBody.AttachStdout = this.attachStdout;
-      this.requestBody.AttachStderr = this.attachStderr;
-      this.requestBody.Tty = this.tty;
-			this.requestBody.Cmd = this.cmd;
-    },
+	  	},
+	    attached: function() {
+	      if(this.auto) {
+	        this.start = true;
+	      }
+	    },
+	    setBody: function() {
+	      this.requestBody.AttachStdin = this.attachStdin;
+	      this.requestBody.AttachStdout = this.attachStdout;
+	      this.requestBody.AttachStderr = this.attachStderr;
+	      this.requestBody.Tty = this.tty;
+				this.requestBody.Cmd = this.cmd;
+	    },
 		computeUrl: function(host,containerid) {
 			return host +"/containers/"+containerid+"/exec";
 
@@ -110,7 +109,7 @@
 			this.fire('docker-error',{data: e.detail.error});
 		},
 		go: function() {
-      this.setBody();
+      		this.setBody();
 			this.$.ajax.generateRequest();
 		}
 
