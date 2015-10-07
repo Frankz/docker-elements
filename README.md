@@ -25,7 +25,7 @@ bower install docker-elements
 * `docker-attach`: Provides Web Socket connections to docker container using the Docker API
 * `docker-attach-terminal`: UI Terminal Element that uses docker-attach
 * `docker-changes`: Analyze file changes within the container
-*  docker-exec : Exec Create and Start. Exec-start won't work with CORS for now due to Docker API limitation
+* `docker-exec` : Exec Create and Start. Exec-start won't work with CORS for now due to Docker API limitation
 * `docker-inspect`: Inspect a container
 * `docker-kill`: Kill a container
 * `docker-logs`: Get container log, stream is now supported
@@ -54,5 +54,3 @@ bower install docker-elements
 * `docker-copy` : Copy files from a container that returns a tar stream
 * `docker-archive` : Get an tar archive of a resource in the filesystem of container
 * `docker-push`: Push Container to the registry
-* `docker-exec` : Docker exec, this might get delayed until websocket is available from Docker API for exec.
-
