@@ -1,0 +1,102 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-commit">
+	<template>
+		<iron-ajax id="ajax" url="{{url}}" handle-as="json" method="POST" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-commit',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			start: {
+				type: Boolean,
+				notify: true,
+				value: false,
+				observer: '_startChanged'
+			},
+			done: {
+				type: Boolean,
+				notify: true,
+				value: false
+			},
+			containerid: {
+				type: String
+			},
+			commitid: {
+				type: String,
+				notify: true
+			},
+			host: {
+				type: String
+			},
+	        containerid: {
+	        	type: String,
+	        	notify: true
+	        },
+	        repo: {
+	        	type: String,
+	        	notify: true,
+	        	value: ''
+	        },
+	        tag: {
+	        	type: String,
+	        	notify: true,
+	        	value: ''
+	        },
+	        comment: {
+	        	type: String,
+	        	notify: true,
+	        	value: ''
+	        },
+	        author: {
+	        	type: String,
+	        	notify: true,
+	        	value: ''
+	        },
+			result: {
+				type: Object,
+				notify: true
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,containerid,repo,tag,comment,author)'
+			}
+		},
+		attached: function() {
+			if(this.auto) {
+				this.start = true;
+			}
+		},
+		_startChanged: function(newValue, oldValue) {
+    		if(newValue && !oldValue) {
+				this.go();
+			}
+  		},
+		computeUrl: function(host,containerid,_repo,_tag,_comment,_author) {
+			var repo = _repo != ''? "&repo="+_repo : '',
+				tag = _tag != '' ? "&tag="+_tag : '',
+				comment = _comment != '' ? "&comment="+_comment : '',
+				author = _author != '' ? "&author="+_author : '';
+			return host +"/commit?container="+containerid+tag+repo+comment+author;
+
+		},
+		handleResponse: function(e) {
+			this.commitid = e.detail.response.Id;
+			this.fire('docker-commit-'+this.containerid,{data: e.detail.response});
+			this.done = true;
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>

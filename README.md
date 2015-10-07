@@ -9,9 +9,11 @@ Install the docker elements using bower:
 bower install docker-elements
 ```
 
-## Elements in Progress
-* `docker-commit` : Commit container
-* `docker-container` : UI element to manage a container from a single element that aggregates all container operations
+## Work in Progress
+
+* Detailed Documentation
+* Demo Examples 
+* `docker-push`: Push Container to the registry
 
 ## Docker Host Elements Implemented
 * `docker-events`: List events in docker hosts
@@ -21,6 +23,7 @@ bower install docker-elements
 
 ## Docker Container Elements Implemented
 * `docker-create`: Provides API for creating container
+* `docker-commit` : Commit container
 * `docker-ps`: Provides API with listing docker containers
 * `docker-attach`: Provides Web Socket connections to docker container using the Docker API
 * `docker-attach-terminal`: UI Terminal Element that uses docker-attach
@@ -53,4 +56,3 @@ bower install docker-elements
 ## Elements not yet implemented
 * `docker-copy` : Copy files from a container that returns a tar stream
 * `docker-archive` : Get an tar archive of a resource in the filesystem of container
-* `docker-push`: Push Container to the registry
