@@ -1,0 +1,205 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="docker-attach.html">
+<!--
+The `docker-attach-terminal` provides UI Terminal to docker container
+
+    <docker-attach-terminal containerid="c992fa655dae" host="ws://127.0.0.1:2375"></docker-attach-terminal>
+
+By supplying mandatory attribute `containerid` and `host`, the element will provide UI terminal
+interface to the container. This element utilize `docker-attach` 
+which provide web socket connection to the running container tty. This element will connect automatically
+to the docker-attach websocket API.
+
+@demo docker-attach-terminal/demo/index.html
+-->
+<script src="term.js"></script>
+
+<dom-module id="docker-attach-terminal">
+	<template>
+		<docker-attach id="attach" containerid="{{containerid}}" host="{{host}}" logs="{{logs}}" stream="{{stream}}" stdin="{{stdin}}" stdout="{{stdout}}" stderr="{{stderr}}" readonly="{{readonly}}" windows="{{windows}}"></docker-attach>
+		<div id="terminal"></div>
+	</template>
+</dom-module>
+
+<script>
+	Polymer({
+		is: 'docker-attach-terminal',
+		properties: {
+			/**
+		    * Automatically Open connection when rendered
+		    */	
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			/**
+		    * Start attribute, when changed to `true` it will call the API.
+		    * This is normally used when data-binding to other element's done output to
+		    * form a workflow or chained process.
+		    */	
+			start: {
+				type: Boolean,
+				notify: true,
+				value: false,
+				observer: '_startChanged'
+			},
+			/**
+		    * Done attribute, when the API call successfully finished, it will
+		    * be changed to `true`. Normally used for data-binding to other element's input to
+		    * start.
+		    */
+			done: {
+				type: Boolean,
+				notify: true,
+				value: false
+			},
+			/**
+		    * Docker Container ID.
+		    */			
+			containerid : {
+				type: String
+			},
+			/**
+		    * The Docker Host target.
+		    */
+			host: {
+				type: String
+			},
+			/**
+		    * Term js Object. User shouldn't be set manually, automatically initialized
+		    */
+			term: {
+				type: Object
+			},
+			/**
+		    * Terminal Rows size
+		    */
+			rows: {
+				type: Number,
+				value: 24
+			},
+			/**
+		    * Terminal Cols size.
+		    */
+			cols: {
+				type: Number,
+				value: 125
+			},
+			/**
+		    * Set to output historical logs.
+		    */
+			logs: {
+				type: Number,
+				value: 0
+			},
+			/**
+		    * Set to stream interaction.
+		    */
+			stream :{
+				type: Number,
+				value: 1
+			},
+
+			/**
+		    * Set to interact with stdin.
+		    */
+			stdin: {
+				type: Number,
+				value: 1
+			},
+
+			/**
+		    * Set to listen on stdout.
+		    */
+			stdout: {
+				type: Number,
+				value: 1
+			},
+
+			/**
+		    * Set to listen on stderr.
+		    */
+			stderr: {
+				type: Number,
+				value: 1
+			},
+
+			/**
+		    * Set to readonly.
+		    */
+			readonly: {
+				type: Boolean,
+				value: false
+			},
+
+			/**
+		    * Windows Container support.
+		    */
+			windows: {
+				type: Boolean,
+				value: false
+			},
+
+			/**
+		    * Pass command when connected initially.
+		    */
+			command: {
+				type: String,
+				value: ''
+			}
+		},
+		listeners: {
+			'docker-attach-message': 'handleReceive'
+		},
+		_startChanged: function(newValue, oldValue) {
+    		if(newValue && !oldValue) {
+				this.open();
+			}
+  		},
+		ready: function() {
+
+			this.term = new Terminal({
+	            cols: this.cols,
+	            rows: this.rows,
+	            convertEol: true,
+	            useStyle: true,
+	            cursorBlink: true,
+	            screenKeys: true
+			});
+
+			if (!this.readonly)
+			{
+				var that = this;
+				this.term.on('data', function(data) {	  
+	            	if(that.windows && data == '') { 
+	            		//Backspace	in windows
+	            		that.$.attach.send(unescape('%08'));
+	            	} else {
+	            		that.$.attach.send(data);	
+	            	}
+	          	});
+			}
+
+			this.term.open(this.$.terminal);
+		},
+
+		attached: function() {
+			if (this.auto) {
+				this.open();
+			}
+			if (this.command != '') {
+				this.term.write(this.command+"\n");
+			}
+		},
+		
+		open: function() {
+			this.$.attach.open();
+			this.done = true;
+		},
+
+		handleReceive: function(e) {
+			this.term.write(e.detail.data);			
+		}
+
+	});
+</script>

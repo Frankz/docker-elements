@@ -1,0 +1,118 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+<!--
+The `docker-history` element grabs a list of history of image
+
+    <docker-history image="ubuntu" 
+    		host="http://127.0.0.1:2375" 
+    		result="{{result}}" auto></docker-history>
+
+@demo demo/index.html
+-->
+<dom-module id="docker-history">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-history',
+		/**
+	     * Fired when docker history API call has finished.
+	     *
+	     * @event docker-history
+	     */
+
+		/**
+	     * Fired when docker changes API error has been received.
+	     *
+	     * @event docker-error
+	     */
+		properties: {
+			/**
+		    * Automatically call API when rendered
+		    */
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			/**
+		    * Container Image
+		    */
+			image: {
+				type: String
+			},
+			/**
+		    * Docker Host
+		    */
+			host: {
+				type: String
+			},
+			/**
+		    * Raw Result Object. Example:
+		    *
+		    * 	[
+			*	    {
+			*	        "Id": "3db9c44f45209632d6050b35958829c3a2aa256d81b9a7be45b362ff85c54710",
+			*	        "Created": 1398108230,
+			*	        "CreatedBy": "/bin/sh -c #(nop) ADD file:eb15dbd63394e063b805a3c32ca7bf0266ef64676d5a6fab4801f2e81e2a5148 in /",
+			*	        "Tags": [
+			*	            "ubuntu:lucid",
+			*	            "ubuntu:10.04"
+			*	        ],
+			*	        "Size": 182964289,
+			*	        "Comment": ""
+			*	    },
+			*	    {
+			*	        "Id": "6cfa4d1f33fb861d4d114f43b25abd0ac737509268065cdfd69d544a59c85ab8",
+			*	        "Created": 1398108222,
+			*	        "CreatedBy": "/bin/sh -c #(nop) MAINTAINER Tianon Gravi <admwiggin@gmail.com> - mkimage-debootstrap.sh -i iproute,iputils-ping,ubuntu-minimal -t lucid.tar.xz lucid http://archive.ubuntu.com/ubuntu/",
+			*	        "Tags": null,
+			*	        "Size": 0,
+			*	        "Comment": ""
+			*	    },
+			*	    {
+			*	        "Id": "511136ea3c5a64f264b78b5433614aec563103b4d4702f3ba7d4d2698e22c158",
+			*	        "Created": 1371157430,
+			*	        "CreatedBy": "",
+			*	        "Tags": [
+			*	            "scratch12:latest",
+			*	            "scratch:latest"
+			*	        ],
+			*	        "Size": 0,
+			*	        "Comment": "Imported from -"
+			*	    }
+			*	]
+		    *
+		    *
+		    */
+			result: {
+				type: Object,
+				notify: true
+			},
+	        /**
+		    * Computed URL, this is automatically generated.
+		    */
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,image)'
+			},
+		},
+		computeUrl: function(host,image) {
+			return host +"/images/"+image+"/history";
+		},
+		handleResponse: function(e) {
+			this.fire('docker-history',{data: e.detail.response});
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},	
+		/**
+		 * Trigger the docker API request
+		 */		
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>

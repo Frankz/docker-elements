@@ -1,0 +1,173 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<!--
+The `docker-commit` element exposes docker changes API that will commit a
+container as an image.
+
+    <docker-commit host="http://127.0.0.1:2375" containerid="8abbad437618" 
+    			   repo="jw" tag="latest" commitid="{{newid}}" auto>
+    </docker-commit>
+
+The output `commitid` is a String that represents the commited docker image id.
+
+@demo demo/index.html
+-->
+
+<dom-module id="docker-commit">
+	<template>
+		<iron-ajax id="ajax" url="{{url}}" handle-as="json" method="POST" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-commit',
+		/**
+	     * Fired when docker commit API call has been received.
+	     *
+	     * @event docker-commit
+	     */
+
+		/**
+	     * Fired when docker changes API error has been received.
+	     *
+	     * @event docker-error
+	     */
+
+		properties: {
+			/**
+		    * Automatically call API when rendered
+		    */	
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			/**
+		    * Start attribute, when changed to `true` it will call the API.
+		    * This is normally used when data-binding to other element's done output to
+		    * form a workflow or chained process.
+		    */	
+			start: {
+				type: Boolean,
+				notify: true,
+				value: false,
+				observer: '_startChanged'
+			},
+			/**
+		    * Done attribute, when the API call successfully finished, it will
+		    * be changed to `true`. Normally used for data-binding to other element's input to
+		    * start.
+		    */	
+			done: {
+				type: Boolean,
+				notify: true,
+				value: false
+			},
+			/**
+		    * Docker Container ID.
+		    */
+			containerid: {
+				type: String,
+				notify: true
+			},
+			/**
+		    * Docker Output image committed ID.
+		    */
+			commitid: {
+				type: String,
+				notify: true
+			},
+			/**
+		    * Docker Target host.
+		    */
+			host: {
+				type: String
+			},
+			/**
+		    * Mandatory Input repo name.
+		    */
+	        repo: {
+	        	type: String,
+	        	notify: true,
+	        	value: ''
+	        },
+	        /**
+		    * Input image tag
+		    */
+	        tag: {
+	        	type: String,
+	        	notify: true,
+	        	value: ''
+	        },
+	        /**
+		    * Input comment
+		    */
+	        comment: {
+	        	type: String,
+	        	notify: true,
+	        	value: ''
+	        },
+	        /**
+		    * Author of the commit.
+		    */
+	        author: {
+	        	type: String,
+	        	notify: true,
+	        	value: ''
+	        },
+	        /**
+		    * JSON Object Output
+		    * Example Result:
+		    *
+		    *
+		    *		{"Id": "596069db4bf5"}
+		    *
+		    *
+		    */
+			result: {
+				type: Object,
+				notify: true
+			},
+			/**
+		    * Computed URL, this is automatically generated.
+		    */
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,containerid,repo,tag,comment,author)'
+			}
+		},
+		attached: function() {
+			if(this.auto) {
+				this.start = true;
+			}
+		},
+		_startChanged: function(newValue, oldValue) {
+    		if(newValue && !oldValue) {
+				this.go();
+			}
+  		},
+		computeUrl: function(host,containerid,_repo,_tag,_comment,_author) {
+			var repo = _repo != ''? "&repo="+_repo : '',
+				tag = _tag != '' ? "&tag="+_tag : '',
+				comment = _comment != '' ? "&comment="+_comment : '',
+				author = _author != '' ? "&author="+_author : '';
+			return host +"/commit?container="+containerid+tag+repo+comment+author;
+
+		},
+		handleResponse: function(e) {
+			this.commitid = e.detail.response.Id;
+			this.fire('docker-commit',{data: e.detail.response});
+			this.done = true;
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},
+		/**
+		 * Trigger the docker API request
+		 */	
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>

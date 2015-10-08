@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Docker commit demo</title>
+		<script src="../../../webcomponentsjs/webcomponents-lite.min.js"></script>
+		<link rel="import" href="../docker-commit.html">
+	</head>
+	<body>
+			
+	  <template id="t" is="dom-bind">
+	    <docker-commit host="http://127.0.0.1:4243" containerid="8abbad437618" repo="jan" tag="latest" result="{{result}}" auto></docker-commit>
+	    <div>Result</div>
+	    <div><span>ID: </span><span>{{result.Id}}</span></div> 
+	    
+	  </template>			
+	</body>
+</html>

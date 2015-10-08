@@ -1,0 +1,53 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-resize">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="POST" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-resize',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			containerid: {
+				type: String
+			},
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true
+			},
+			height: {
+				type: Number				
+			},
+			width: {
+				type: Number
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,containerid,height,width)'
+			}
+		},
+		computeUrl: function(host,containerid,stream) {
+			return host +"/containers/"+containerid+"/resize?h="+height+"&w="+width;
+			
+		},
+		handleResponse: function(e) {
+			this.fire('docker-resize-'+this.containerid,{data: e.detail.response});
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},		
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>
