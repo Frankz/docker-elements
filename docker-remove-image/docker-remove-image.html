@@ -1,14 +1,14 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
 
-<dom-module id="docker-remove">
+<dom-module id="docker-remove-image">
 	<template>
 		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="DELETE" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
 	</template>
 </dom-module>
 <script>
 	Polymer({
-		is: 'docker-remove',
+		is: 'docker-remove-image',
 		properties: {
 			auto: {
 				type: Boolean,

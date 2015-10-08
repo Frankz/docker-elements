@@ -3,14 +3,14 @@
 <!--
 The `docker-attach-terminal` provides UI Terminal to docker container
 
-    <docker-attach-terminal containerid="c992fa655dae" host="http://127.0.0.1:2375"></docker-attach-terminal>
+    <docker-attach-terminal containerid="c992fa655dae" host="ws://127.0.0.1:2375"></docker-attach-terminal>
 
 By supplying mandatory attribute `containerid` and `host`, the element will provide UI terminal
 interface to the container. This element utilize `docker-attach` 
 which provide web socket connection to the running container tty. This element will connect automatically
 to the docker-attach websocket API.
 
-@demo demo/index.html
+@demo docker-attach-terminal/demo/index.html
 -->
 <script src="term.js"></script>
 
@@ -25,6 +25,34 @@ to the docker-attach websocket API.
 	Polymer({
 		is: 'docker-attach-terminal',
 		properties: {
+			/**
+		    * Automatically Open connection when rendered
+		    */	
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			/**
+		    * Start attribute, when changed to `true` it will call the API.
+		    * This is normally used when data-binding to other element's done output to
+		    * form a workflow or chained process.
+		    */	
+			start: {
+				type: Boolean,
+				notify: true,
+				value: false,
+				observer: '_startChanged'
+			},
+			/**
+		    * Done attribute, when the API call successfully finished, it will
+		    * be changed to `true`. Normally used for data-binding to other element's input to
+		    * start.
+		    */
+			done: {
+				type: Boolean,
+				notify: true,
+				value: false
+			},
 			/**
 		    * Docker Container ID.
 		    */			
@@ -123,8 +151,13 @@ to the docker-attach websocket API.
 		listeners: {
 			'docker-attach-message': 'handleReceive'
 		},
-
+		_startChanged: function(newValue, oldValue) {
+    		if(newValue && !oldValue) {
+				this.open();
+			}
+  		},
 		ready: function() {
+
 			this.term = new Terminal({
 	            cols: this.cols,
 	            rows: this.rows,
@@ -151,11 +184,19 @@ to the docker-attach websocket API.
 		},
 
 		attached: function() {
+			if (this.auto) {
+				this.open();
+			}
 			if (this.command != '') {
 				this.term.write(this.command+"\n");
 			}
 		},
 		
+		open: function() {
+			this.$.attach.open();
+			this.done = true;
+		},
+
 		handleReceive: function(e) {
 			this.term.write(e.detail.data);			
 		}

@@ -3,13 +3,13 @@
 <!--
 The `docker-attach` element exposes docker attach websocket API
 
-    <docker-attach containerid="c992fa655dae" host="http://127.0.0.1:2375"></docker-attach>
+    <docker-attach containerid="c992fa655dae" host="ws://127.0.0.1:2375"></docker-attach>
 
 By supplying mandatory attribute `containerid` and `host`, the element will provide the websocket
 interface to the container. This element will work nicely in tandem with `docker-attach-terminal` 
 which provide UI Terminal to the container.
 
-@demo demo/index.html
+@demo docker-attach-terminal/demo/index.html
 -->
 
 
@@ -115,7 +115,7 @@ which provide UI Terminal to the container.
 		    */
 			auto: {
 				type: Boolean,
-				value: true
+				value: false
 			}
 		},
 		listeners: {

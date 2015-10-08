@@ -1,12 +1,37 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Docker Attach Demo</title>
+		<title>Docker Pull, Create, Start, Attach Demo</title>
 		<script src="../../../webcomponentsjs/webcomponents-lite.min.js"></script>
+		<link rel="import" href="../../docker-pull/docker-pull.html">
+		<link rel="import" href="../../docker-create/docker-create.html">
+		<link rel="import" href="../../docker-start/docker-start.html">
 		<link rel="import" href="../docker-attach-terminal.html">
+
 	</head>
 	<body>
-		<docker-attach-terminal host="ws://127.0.0.1:4243" containerid="c992fa655dae"></docker-attach-terminal>
-		
+	  <template id="t" is="dom-bind">
+      
+      		<div>
+      			<div>Ensure you have added the following config in your docker config file</div>
+      			<pre>-H tcp://127.0.0.1:2375 --api-enabled-cors</pre>
+      			<div>Wait until all the Pull, Create and Start status done is set to true then press enter on the terminal below.</div>
+      		</div>
+
+			<docker-pull host="http://127.0.0.1:2375" result="{{pullresult}}" done="{{pullDone}}" image="busybox" tag="latest" auto></docker-pull>
+			<docker-create start="{{pullDone}}" host="http://127.0.0.1:2375" result="{{result}}"
+						   containerid="{{containerid}}" tty="true" open-stdin="true" done="{{createDone}}" image="busybox"></docker-create>
+
+			<docker-start host="http://127.0.0.1:2375" result="{{result}}" containerid="{{containerid}}" start="{{createDone}}" done="{{startDone}}"></docker-start>
+			<div>
+			<div>Pull Status Done: <span>{{pullDone}}</span></div>
+			<div>Container Created: <span>{{createDone}}</span>&nbsp;<span>{{containerid}}</span></div>
+			<div>Start Container: <span>{{startDone}}</span></div>
+			</div>
+			<br/>
+			<docker-attach-terminal start="{{startDone}}" containerid="{{containerid}}" host="ws://127.0.0.1:2375"></docker-attach-terminal>
+
+
+	  </template>
 	</body>
 </html>
