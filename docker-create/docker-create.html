@@ -1,6 +1,20 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
+<!--
+The `docker-create` element exposes docker changes API that will create a
+container.
 
+    <docker-create host="http://127.0.0.1:4243" result="{{result}}"
+		env='["DISPLAY=unix:0"]'
+		image="chrome"
+		name="mycontainer"
+		containerid="{{containerid}}"
+		memory=536870912></docker-create>
+
+The output `containerid` is a String that represents the newly created docker container id.
+
+@demo demo/index.html
+-->
 <dom-module id="docker-create">
 	<template>
 		<iron-ajax id="ajax"  url="{{url}}" handle-as="json" method="POST" body="{{requestBody}}" content-type="application/json" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
@@ -9,36 +23,73 @@
 <script>
 	Polymer({
 		is: 'docker-create',
+		/**
+	     * Fired when docker create API call has been received.
+	     *
+	     * @event docker-create
+	     */
+
+		/**
+	     * Fired when docker changes API error has been received.
+	     *
+	     * @event docker-error
+	     */
+
 		properties: {
+			/**
+		    * Automatically call API when rendered
+		    */	
 			auto: {
 				type: Boolean,
 				notify: true,
 				value: false
 			},
+			/**
+		    * Docker Target host.
+		    */
 			host: {
 				type: String,
 				notify: true
 			},
+			/**
+		    * Start attribute, when changed to `true` it will call the API.
+		    * This is normally used when data-binding to other element's done output to
+		    * form a workflow or chained process.
+		    */	
 			start: {
 				type: Boolean,
 				notify: true,
 				value: false,
 				observer: '_startChanged'
 			},
+			/**
+		    * Done attribute, when the API call successfully finished, it will
+		    * be changed to `true`. Normally used for data-binding to other element's input to
+		    * start.
+		    */
 			done: {
 				type: Boolean,
 				notify: true,
 				value: false
 			},
+			/**
+		    * OUtput Docker Container ID.
+		    */
 			containerid:{
 				type: String,
 				notify: true
 			},
+			/**
+		    * Input container name
+		    */
 			name: {
 				type: String,
 				notify: true,
 				value: ''
 			},
+			/**
+		    * Ajax Request Body. This is automatically generated
+		    */
 			requestBody: {
 				type: Object,
 				value: function() {
@@ -46,91 +97,182 @@
 				},
 				notify: true
 			},
+			/**
+		    * Ajax Response
+		    */
 			result: {
 				type: Object,
 				notify: true
 			},
+			/**
+		    * Computed URL, this is automatically generated.
+		    */
 			url: {
   				type: String,
   				computed: 'computeUrl(host,name)'
 			},
+			/**
+		    * Input Hostname of the container
+		    */
 			hostname: {
 				type: String,
 				notify: true
 			},
-
+			/**
+		    * Input domain name of the container
+		    */
 			domainName: {
 				type: String,
 				notify: true
 			},
+			/**
+		    * User to run the container as.
+		    */
 			user: {
 				type: String,
 				notify: true
 			},
+			/**
+		    * Attaches to stdin.
+		    */
 			attachStdin: {
 				type: Boolean,
 				notify: true
 			},
+			/**
+		    * Attaches to stdout.
+		    */
 			attachStdout: {
 				type: Boolean,
 				notify: true
 			},
+			/**
+		    * Attaches to stderr.
+		    */
 			attachStderr: {
 				type: Boolean,
 				notify: true
 			},
+			/**
+		    * Attaches standard streams to a tty, including stdin if it's not closed.
+		    * (-t option)
+		    */
 			tty: {
 				type: Boolean,
 				notify: true
 			},
+			/**
+		    * Interactive, Keep stdin open even if not attached. (-i option)
+		    */
 			openStdin: {
 				type: Boolean,
 				notify: true
 			},
+			/*
+			* Close stdin after the 1 attached client disconnects.
+			*/
 			stdinOnce: {
 				type: Boolean,
 				notify: true
 			},
+			/*
+			* Array object of Environment variables (-e option)
+			* Example:
+			*
+			*	env='["DISPLAY=unix:0", "FOO=bar"]'
+			*
+			*
+			*/
 			env: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* Array object representing cmd to execute including args
+			* Example:
+			*
+			*	cmd='["ls", "-l"]'
+			*
+			*
+			*/
 			cmd: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* Set the entry point for the container as a string
+			*/
 			entryPoint: {
 				type: String,
 				notify: true
 			},
+			/*
+			* Image name, e.g. jess/visualstudio
+			*/
 			image: {
 				type: String,
 				notify: true
 			},
+			/*
+			* Adds a map of labels to a container. To specify a map:
+			* `{"key":"value"[,"key2":"value2"]}`
+			*
+			* Example:
+			*
+			*	labels='{"com.example.vendor": "KapalHQ","com.example.version": "1.0"}'
+            *
+            *  		
+			*/
 			labels: {
 				type: Object,
 				notify: true
 			},
+			/*
+			* An array of mount points in the container
+			* 
+			*
+			* Example:
+			*
+			*	mounts='[{"Source": "/tmp/.X11-unix", "Destination":"/tmp/.X11-unix", "Mode": "", "RW":true}]'
+            *
+            *  		
+			*/
 			mounts: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* Working Directory of container
+			*/
 			workingDir: {
 				type: String,
 				notify: true
 			},
+			/*
+			* Disable network
+			*/
 			networkDisabled: {
 				type: Boolean,
 				notify: true
 			},
+			/*
+			* MAC Address
+			*/
 			macAddress: {
 				type: String,
 				notify: true
 			},
+			/*
+			* An object mapping ports to an empty object in the form of:
+			* `"ExposedPorts": { "<port>/<tcp|udp>: {}" }`
+			*/
 			exposedPorts: {
 				type: Object,
 				notify: true
 			},
+			/* This is autogenerated hostConfig body parameter, don't use this 
+			* unless you want to craft the hostConfig object yourself
+			*/
 			hostConfig: {
 				type: Object,
 				value: function() {
@@ -138,119 +280,225 @@
 				},
 				notify: true
 			},
+			/*
+			* A list of volume bindings for this container
+			* (-v option) and will need to supply the mounts= parameter
+			* Example: 
+			*
+			*	binds='["/tmp/.X11-unix:/tmp/.X11-unix", "/var/lib/jw:/var/lib/jw:ro"]'
+			*
+			*/
 			binds: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* A list of links for the container. Each link entry should be in the form of
+			* `container_name:alias`
+			*/
 			links: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* LXC specific configurations. These configurations only work when using the lxc execution driver.
+			*/
 			lxcConf: {
 				type: Object,
 				notify: true
 			},
+			/*
+			* Memory limit in bytes
+			*/
 			memory: {
 				type: Number,
 				notify: true
 			},
+			/*
+			* Total memory limit (memory + swap); set -1 to disable swap. 
+			* You must use this with `memory` and make the swap value larger than `memory`
+			*/
 			memorySwap: {
 				type: Number,
 				notify: true
 			},
+			/*
+			* An integer value containing the container’s CPU Shares (ie. the relative weight vs other containers).
+			*/
 			cpuShares: {
 				type: Number,
 				notify: true
 			},
-
+			/*
+			* The length of a CPU period in microseconds.
+			*/
 			cpuPeriod: {
 				type: Number,
 				notify: true
 			},
+			/*
+			* String value containing the `cgroups CpusetCpus` to use.
+			*/
 			cpusetCpus: {
 				type: String,
 				notify: true
 			},
+			/*
+			* Memory nodes (MEMs) in which to allow execution (0-3, 0,1). Only effective on NUMA systems.
+			*/
 			cpusetMems: {
 				type: String,
 				notify: true
 			},
+			/*
+			* Block IO weight (relative weight) accepts a weight value between 10 and 1000.
+			*/
 			blkioWeight: {
 				type: Number,
 				notify: true
 			},
+			/*
+			* Tune a container’s memory swappiness behavior. Accepts an integer between 0 and 100.
+			*/
 			memorySwappiness: {
 				type: Number,
 				notify: true
 			},
+			/*
+			* Disable OOM Killer for the container.
+			*/
 			oomKillDisable: {
 				type: Boolean,
 				notify: true
 			},
+			/*
+			* A map of exposed container ports and the host port they should map to. A JSON object in the form 
+			* `{ <port>/<protocol>: [{ "HostPort": "<port>" }] }` 
+			* Take note that port is specified as a string and not an integer value.
+			*
+			* (-p option)
+			*/
 			portBindings: {
 				type: Object,
 				notify: true
 			},
+			/*
+			* Publish All ports
+			*/
 			publishAllPorts: {
 				type: Boolean,
 				notify: true
 			},
+			/*
+			* Run container with privilege
+			*/
 			privileged: {
 				type: Boolean,
 				notify: true
 			},
+			/*
+			* Read only root file system
+			*/
 			readonlyRootfs:{
 				type: Boolean,
 				notify: true
 			},
+			/*
+			* Array of DNS server to use
+			*
+			* Example: `dns=["8.8.8.8", "9.9.9.9"]`
+			*
+			*/
 			dns: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* A list of DNS search domains
+			*/
 			dnsSearch: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* A list of hostnames/IP mappings to add to the container’s /etc/hosts file. Specified in the form ["hostname:IP"]
+			*/
 			extraHosts: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* A list of volumes to inherit from another container. Specified in the form `<container name>[:<ro|rw>]`
+			*/
 			volumesFrom: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* A list of kernel capabilities to add to the container.
+			*/
 			capAdd: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* A list of kernel capabilities to drop from the container.
+			*/
 			capDrop: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* The behavior to apply when the container exits. 
+			* The value is an object with a Name property of either "always" to always restart or "on-failure" to restart only when the container exit code is non-zero. If on-failure is used, MaximumRetryCount controls the number of times to retry before giving up. The default is not to restart. (optional) An ever increasing delay (double the previous delay, starting at 100mS) is added before each restart to prevent flooding the server.
+			*/
 			restartPolicy: {
 				type: Object,
 				notify: true
 			},
+			/*
+			* Sets the networking mode for the container. Supported values are: bridge, host, and container:<name|id>
+			*/
 			networkMode: {
 				type: String,
 				notify: true
 			},
+			/*
+			* A list of devices to add to the container specified as a JSON object in the form: 
+			* `{ "PathOnHost": "/dev/deviceName", "PathInContainer": "/dev/deviceName", "CgroupPermissions": "mrw"}`
+			*/
 			devices: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* A list of ulimits to set in the container, specified as ` "Name": <name>, "Soft": <soft limit>, "Hard": <hard limit> }`
+			* for example: ulimits='{ "Name": "nofile", "Soft": 1024, "Hard": 2048 }'
+			*/
 			ulimits: {
 				type: Object,
 				notify: true
 			},
+			/*
+			* Log configuration for the container, specified as a JSON object in the form `{ "Type": "<driver_name>", "Config": {"key1": "val1"}}`. 
+			* Available types: json-file, syslog, journald, gelf, none. json-file logging driver
+			*/
 			logConfig: {
 				type: Object,
 				notify: true
 			},
+			/*
+			* A list of string values to customize labels for MLS systems, such as SELinux.
+			*/
 			securityOpts: {
 				type: Array,
 				notify: true
 			},
+			/*
+			* Path to cgroups under which the container’s cgroup is created. 
+			* If the path is not absolute, the path is considered to be relative to the cgroups path of the init process. 
+			* Cgroups are created if they do not already exist.
+			*/
 			cgroupParent: {
 				type: String,
 				notify: true
@@ -328,6 +576,9 @@
 
 			this.requestBody.HostConfig = this.hostConfig;
 		},
+		/**
+		 * Trigger the docker API request
+		 */		
 		go: function() {
 			this.setBody();
 			this.$.ajax.generateRequest();

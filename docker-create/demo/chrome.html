@@ -18,14 +18,14 @@
 			-->
 			<docker-create start="{{pullDone}}" host="http://127.0.0.1:4243" result="{{result}}"
 										 mounts='[{"Source": "/tmp/.X11-unix", "Destination":"/tmp/.X11-unix", "Mode": "", "RW":true},
-                              {"Source": "/dev/shm", "Destination":"/dev/shm", "Mode": "", "RW":true}]'
+                              					{"Source": "/dev/shm", "Destination":"/dev/shm", "Mode": "", "RW":true}]'
 										 network-mode="host"
 										 binds='["/tmp/.X11-unix:/tmp/.X11-unix"]'
 										 env='["DISPLAY=unix:0"]'
 										 image="jess/chrome"
 										 containerid="{{containerid}}"
-                     tty="true"
-                     open-stdin="true"
+                     					 tty="true"
+                     					 open-stdin="true"
 										 cpuset-cpus="0"
 										 memory=536870912
 										 done="{{createDone}}" auto></docker-create>

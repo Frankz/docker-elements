@@ -6,7 +6,7 @@ on container changes from its image
 
     <docker-changes containerid="c992fa655dae" host="http://127.0.0.1:2375"
     				result="{{result}}">
-    </docker-change>
+    </docker-changes>
 
 The output `result` is a JSON Object that can be used in data binding
 
@@ -19,7 +19,7 @@ The output `result` is a JSON Object that can be used in data binding
 </dom-module>
 <script>
 	Polymer({
-		is: 'docker-top',
+		is: 'docker-changes',
 		/**
 	     * Fired when docker changes API call has been received.
 	     *
@@ -57,6 +57,7 @@ The output `result` is a JSON Object that can be used in data binding
 		    * Output result Object.
 	        * Example Result:
 	        *
+	        *
 	        *   [
 			*	     {
 			*	             "Path": "/dev",
@@ -71,6 +72,7 @@ The output `result` is a JSON Object that can be used in data binding
 			*	             "Kind": 1
 			*	     }
 			*	]
+			*
 			*
 		    */	
 			result: {
