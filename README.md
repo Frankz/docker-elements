@@ -1,6 +1,10 @@
 # docker-elements
 Collection of Docker Web Components. This project is currently in progress and our aim is to have custom elements that can be used to interact with Docker API.
 
+## Elements Documentation and Demo
+
+The documentation and demo can be found in [docs](http://kapalhq.com/docker-elements/docs/) pages.
+
 ## Install
 
 Install the docker elements using bower:
