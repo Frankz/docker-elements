@@ -1,6 +1,17 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
+<!--
+The `docker-events` element will retrieve list the events in the docker host. 
+If `until` parameter is not specified, the behaviour of the result will be streaming.
 
+    <docker-events host="http://127.0.0.1:2375" result="{{result}} auto">
+    </docker-events>
+
+The output `result` is a JSON Object that can be used in data binding and will be
+continuously updated if it's streaming
+
+@demo demo/index.html
+-->
 <dom-module id="docker-events">
 	<template>
 		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="text" method="GET" last-request="{{request}}" on-request="handleRequest" on-response="handleResponse" on-response="handleResponse" on-error="handleError"></iron-ajax>
@@ -9,21 +20,51 @@
 <script>
 	Polymer({
 		is: 'docker-events',
+		/**
+	     * Fired when docker events API call has finished.
+	     *
+	     * @event docker-events
+	     */
+
+		/**
+	     * Fired when docker changes API error has been received.
+	     *
+	     * @event docker-error
+	     */
 		properties: {
+			/**
+		    * Automatically call API when rendered
+		    */	
 			auto: {
 				type: Boolean,
 				value: false
-			},			
+			},
+			/**
+		    * Since Timestamp used for polling
+		    */				
 			since: {
 				type: String,
 				value: '',
 				notify: true
 			},
+			/**
+		    * Until Timestamp used for polling
+		    */
 			until: {
 				type: String,
 				value: '',
 				notify: true
-			},			
+			},
+			/**
+			* A json encoded value of the filters to process on the event list. Available filters
+			* 
+			* event=<string>
+			* image=<string>
+			* container=<string>
+			*
+			* Example: filters='{"image": ["ubuntu"], "event": ["kill","stop"]}'
+			*
+			*/			
 			filters: {
 				type: Object,
 				notify: true,
@@ -33,17 +74,36 @@
 					};
 				}
 			},
+			/**
+		    * The Docker target host.
+		    */	
 			host: {
 				type: String
 			},
+			/**
+			* Result Object
+			*
+			* Example Output in this format:
+			*
+			* [{"status": "create", "id": "dfdf82bd3881","from": "ubuntu:latest", "time":1374067924},
+			* {"status": "start", "id": "dfdf82bd3881","from": "ubuntu:latest", "time":1374067924},
+			* {"status": "stop", "id": "dfdf82bd3881","from": "ubuntu:latest", "time":1374067966},
+			* {"status": "destroy", "id": "dfdf82bd3881","from": "ubuntu:latest", "time":1374067970}]
+			*/
 			result: {
 				type: Object,
 				notify: true
 			},
+			/**
+			* Request Object sent to API, Don't modify this attribute
+			*/
 			request: {
 				type: Object,
 				notify: true
 			},
+			/**
+		    * Computed URL, this is automatically generated.
+		    */
 			url: {
   				type: String,
   				computed: 'computeUrl(host,since,until,filters)'
@@ -59,11 +119,14 @@
 		},
 		handleResponse: function(e) {
 			this.result = e.detail.response;
-			this.fire('docker-events-message',{data: e.detail.response});
+			this.fire('docker-events',{data: e.detail.response});
 		},
 		handleError: function(e) {
 			this.fire('docker-error',{data: e.detail.error});
-		},		
+		},
+		/**
+		 * Trigger the docker API request
+		 */			
 		go: function() {
 			this.$.ajax.generateRequest();
 		},

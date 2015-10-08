@@ -9,20 +9,10 @@
 	<body>
 
 	  <template id="t" is="dom-bind">
-
-
-
-			<!--Configure - This is da Juice-->
-      <!--
-			<docker-pull host="http://127.0.0.1:4243" result="{{pullresult}}" done="{{pullDone}}" image="jess/visualstudio" tag="latest" auto></docker-pull>
-      -->
 			<docker-exec-create start="{{pullDone}}" host="http://127.0.0.1:4243" result="{{result}}"
 										 containerid="8abbad437618" execid="{{execid}}" cmd='["ifconfig"]'
 										 done="{{createDone}}" auto></docker-exec-create>
 			<docker-exec-start host="http://127.0.0.1:4243" result="{{result}}" execid="{{execid}}" start="{{createDone}}" done="{{startDone}}"></docker-exec-start>
-
-
-
 			<!-- Print Result -->
 			<div>Container Created: <span>{{createDone}}</span>&nbsp;<span>{{execid}}</span></div>
 			<div>Start Container: <span>{{startDone}}</span></div>

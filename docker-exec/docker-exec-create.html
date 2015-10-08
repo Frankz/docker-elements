@@ -1,6 +1,19 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
+<!--
+The `docker-exec-create` element creates an Docker exec instance
 
+    <docker-exec-create start="{{pullDone}}" 
+    		host="http://127.0.0.1:2375" 
+    		result="{{result}}"
+			containerid="8abbad437618" execid="{{execid}}" 
+			cmd='["ifconfig"]'
+			done="{{createDone}}" auto></docker-exec-create>
+
+The output `execid` is a exec instance id that can be used by `docker-exec-start` element
+
+@demo demo/index.html
+-->
 <dom-module id="docker-exec-create">
 	<template>
 		<iron-ajax id="ajax" url="{{url}}" handle-as="json" method="POST" last-response="{{result}}" body="{{requestBody}}" content-type="application/json" on-response="handleResponse" on-error="handleError"></iron-ajax>
@@ -9,36 +22,75 @@
 <script>
 	Polymer({
 		is: 'docker-exec-create',
+		/**
+	     * Fired when docker docker-exec API call has finished.
+	     *
+	     * @event docker-exec-create
+	     */
+
+		/**
+	     * Fired when docker changes API error has been received.
+	     *
+	     * @event docker-error
+	     */
 		properties: {
+			/**
+		    * Automatically call API when rendered
+		    */	
 			auto: {
 				type: Boolean,
 				value: false
 			},
+			/**
+		    * Start attribute, when changed to `true` it will call the API.
+		    * This is normally used when data-binding to other element's done output to
+		    * form a workflow or chained process.
+		    */	
 			start: {
 				type: Boolean,
 				notify: true,
 				value: false,
 				observer: '_startChanged'
 			},
+			/**
+		    * Done attribute, when the API call successfully finished, it will
+		    * be changed to `true`. Normally used for data-binding to other element's input to
+		    * start.
+		    */
 			done: {
 				type: Boolean,
 				notify: true,
 				value: false
 			},
+			/**
+		    * Input Container ID.
+		    */
 			containerid: {
 				type: String
 			},
+			/**
+		    * Output Exec instance id
+		    */
 	        execid: {
 	          type: String,
 	          notify: true
 	        },
+	        /**
+	        * The Docker Host.
+	        */
 			host: {
 				type: String
 			},
+			/**
+	        * Output Raw JSON Object.
+	        */
 			result: {
 				type: Object,
 				notify: true
 			},
+			/**
+			* Raw Request Body, Don't craft manually, it is auto generated based on attributes.
+			*/
 	        requestBody: {
 	          type: Object,
 	          notify: true,
@@ -46,27 +98,41 @@
 	            return {};
 	          }
 	        },
+	        /**
+	        * Attach to stdin
+	        */
 	        attachStdin: {
 	          type: Boolean,
 	          notify: true,
 	          value:false
 	        },
-
+	        /**
+	        * Attach to stdout
+	        */
 	        attachStdout: {
 	          type: Boolean,
 	          notify: true,
 	          value: true
 	        },
+	       	/**
+	        * Attach to stderr
+	        */
 	        attachStderr: {
 	          type: Boolean,
 	          notify: true,
 	          value: true
 	        },
+	       	/**
+	        * Tty (option -t)
+	        */
 	        tty: {
 	          type: Boolean,
 	          notify: true,
 	          value: false
 	        },
+	        /**
+	        * List of strings representing the command to exec
+	        */
 			cmd: {
 				type: Array,
 				notify: true,
@@ -74,6 +140,9 @@
 					return []
 				}
 			},
+			/**
+		    * Computed URL, this is automatically generated.
+		    */
 			url: {
   				type: String,
   				computed: 'computeUrl(host,containerid)'
@@ -102,12 +171,15 @@
 		},
 		handleResponse: function(e) {
 			this.execid = e.detail.response.Id;
-			this.fire('docker-exec-create-'+this.containerid,{data: e.detail.response});
+			this.fire('docker-exec-create',{data: e.detail.response});
 			this.done = true;
 		},
 		handleError: function(e) {
 			this.fire('docker-error',{data: e.detail.error});
 		},
+		/**
+		 * Trigger the docker API request
+		 */					
 		go: function() {
       		this.setBody();
 			this.$.ajax.generateRequest();
