@@ -14,7 +14,7 @@
       
       		<div>
       			<div><span>Docker Host (e.g. 127.0.0.1:2375):</span><input id="dockerhost" type="text" oninput="changeHost()" value="{{dockerhost::input}}"/></div>
-      			<div><span>Endpoint: </span><span>{{httphost}}</span>&nbsp;<button onclick="run()">Run!</button></div>
+      			<div><span>Endpoint: </span><span>{{httphost}}</span>&nbsp;<button id="btnrun" onclick="run()">Run!</button></div>
       			
       		</div>
       		<br/>
@@ -53,6 +53,8 @@
 		function run() {
 			var dockerpull = document.querySelector("docker-pull");
 			dockerpull.go();
+			var btnrun = document.querySelector("#btnrun");
+			btnrun.disabled = true
 		}
 
 	</script>
