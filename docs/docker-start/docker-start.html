@@ -1,0 +1,64 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-start">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="POST" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-start',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			start: {
+				type: Boolean,
+				notify: true,
+				value: false,
+				observer: '_startChanged'
+			},
+			done: {
+				type: Boolean,
+				notify: true,
+				value: false
+			},
+			containerid: {
+				type: String
+			},
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,containerid)'
+			}
+		},
+		_startChanged: function(newValue, oldValue) {
+    		if(newValue && !oldValue) {
+				this.go();
+			}
+  		},
+		computeUrl: function(host,containerid) {
+			return host +"/containers/"+containerid+"/start";
+
+		},
+		handleResponse: function(e) {
+			this.fire('docker-start-'+this.containerid,{data: e.detail});
+			this.done = true;
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>

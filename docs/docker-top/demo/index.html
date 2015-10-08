@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Docker top demo</title>
+		<script src="../../../webcomponentsjs/webcomponents-lite.min.js"></script>
+		<link rel="import" href="../docker-top.html">
+	</head>
+	<body>
+			
+	  <template id="t" is="dom-bind">
+	    <docker-top host="http://192.168.0.31:4243" containerid="c026652db5ea" result="{{result}}" auto></docker-top>
+	    <div>Result</div>
+	    <div><span>{{result.Titles.0}}</span>,<span>{{result.Titles.1}}</span>,<span>{{result.Titles.2}}</span>,<span>{{result.Titles.3}}</span></div>
+	    <template is="dom-repeat" items="{{result.Processes}}">	    
+	    	<div><span>{{item.0}}</span>,<span>{{item.1}}</span>,<span>{{item.2}}</span>,<span>{{item.3}}</span></div>
+	    </template>	    	    	    
+	  </template>			
+	</body>
+</html>

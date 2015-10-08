@@ -1,0 +1,51 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-kill">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="POST" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-kill',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			containerid: {
+				type: String
+			},
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true
+			},
+			signal: {
+				type: String,
+				value: ''
+			},	
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,containerid,signal)'
+			}
+		},
+		computeUrl: function(host,containerid,signal) {
+			return host +"/containers/"+containerid+"/kill"+(signal != '' ? "?signal="+signal : '');
+			
+		},
+		handleResponse: function(e) {
+			this.fire('docker-kill-'+this.containerid,{data: e.detail});
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},		
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>

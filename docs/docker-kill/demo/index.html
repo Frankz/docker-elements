@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Docker kill demo</title>
+		<script src="../../../webcomponentsjs/webcomponents-lite.min.js"></script>
+		<link rel="import" href="../docker-kill.html">
+	</head>
+	<body>
+			
+	  <template id="t" is="dom-bind">
+	    <docker-kill host="http://192.168.0.31:4243" containerid="e5dc373906a7" result="{{result}}" auto></docker-kill>
+	    <div>Result</div>
+	    <div>{{result}}</div>
+	    
+	  </template>			
+	</body>
+</html>

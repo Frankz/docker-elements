@@ -1,0 +1,91 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-logs">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" method="GET" handle-as="text" last-request="{{request}}" on-request="handleRequest" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-logs',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			containerid: {
+				type: String,
+			},
+			host: {
+				type: String
+			},
+			stdout: {
+				type: Boolean,
+				value: false
+			},
+			stderr: {
+				type: Boolean,
+				value: false
+			},
+			since: {
+				type: Number,
+				value: 0				
+			},
+			timestamps: {
+				type: Boolean,
+				value: false,
+			},
+			tail: {
+				type: String, /*All or A Number*/
+				value: ''
+			},
+			follow: {
+				type: Boolean,
+				value: false
+			},
+			result: {
+				type: Object,
+				notify: true
+			},
+			request: {
+				type: Object,
+				notify: true
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,containerid,stdout,stderr,since,timestamps,tail,follow)'
+			},
+		},
+		computeUrl: function(host,containerid,_stdout,_stderr,_since,_timestamps,_tail,follow) {
+			
+			var stdout = this.stdout ? 1 : 0,
+				stderr = this.stderr ? 1 : 0,
+				since = this.since != 0 ? ("&since="+this.since) : '',
+				timestamps = this.timestamps ? ("&timestamps=1") : '',
+				tail = this.tail != '' ? ("&tail=" + this.tail) : '';
+
+			return host +"/containers/"+containerid+"/logs?follow="+follow+"&stdout="+stdout+"&stderr="+stderr+since+timestamps+tail;
+			
+		},
+		handleResponse: function(e) {
+			this.result = e.detail.response;
+			this.fire('docker-logs-'+this.containerid,{data: e.detail.response});
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},
+		go: function() {
+			this.$.ajax.generateRequest();
+		},
+		handleRequest: function(e) {
+			if(this.follow) {
+				var that = this;
+				this.request.xhr.addEventListener('progress', function (progress) {
+			    	that.result = that.request.xhr.responseText;
+			    });
+			}
+		}
+
+	})
+</script>

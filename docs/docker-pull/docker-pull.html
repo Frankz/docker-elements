@@ -1,0 +1,159 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+<!--
+The `docker-pull` provides integration with Docker pull API
+
+    <docker-pull host="http://127.0.0.1:2375" result="{{result}}"
+		image="busybox"
+		tag="latest"></docker-pull>
+
+@demo docker-attach-terminal/demo/index.html
+-->
+<dom-module id="docker-pull">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="text" method="POST" last-request="{{request}}" on-request="handleRequest" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		/**
+	     * Fired when docker pull API call has been received.
+	     *
+	     * @event docker-pull-done
+	     */
+
+		/**
+	     * Fired when docker changes API error has been received.
+	     *
+	     * @event docker-error
+	     */
+		is: 'docker-pull',
+		properties: {
+			/**
+		    * Automatically call API when rendered
+		    */	
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			/**
+		    * Docker host endpoint
+		    */	
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true
+			},
+			/**
+		    * Start attribute, when changed to `true` it will call the API.
+		    * This is normally used when data-binding to other element's done output to
+		    * form a workflow or chained process.
+		    */	
+			start: {
+				type: Boolean,
+				notify: true,
+				value: false,
+				observer: '_startChanged'
+			},
+			/**
+		    * Done attribute, when the API call successfully finished, it will
+		    * be changed to `true`. Normally used for data-binding to other element's input to
+		    * start.
+		    */
+			done: {
+				type: Boolean,
+				value: false,
+				notify: true
+			},
+			/**
+		    * Ajax Request Body. This is automatically generated
+		    */
+			request: {
+				type: Object,
+				notify: true
+			},
+			/**
+		    * Image Name
+		    */
+			image: {
+				type: String,
+				value: ''
+			},
+			/**
+		    * Repo Name
+		    */
+			repo: {
+				type: String,
+				value: ''
+			},
+			/**
+		    * Tag
+		    */
+			tag: {
+				type: String,
+				value: ''
+			},
+			/**
+		    * Registry
+		    */
+			registry: {
+				type: String,
+				value: ''
+			},
+			/**
+		    * Computed URL, this is automatically generated.
+		    */
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,image,repo,tag,registry)'
+			}
+		},
+		computeUrl: function(host,image,repo,tag,registry) {
+			return host +"/images/create?fromImage="+image+(repo != '' ? "&repo="+ repo : '')+(tag != '' ? "&tag="+ tag : '')+(registry != '' ? "&registry="+ registry : '');
+		},
+		_startChanged: function(newValue, oldValue) {
+    		if(newValue && !oldValue) {
+				this.go();
+			}
+  		},
+		handleResponse: function(e) {
+			this.done = true;
+			this.fire('docker-pull-done',{data: e.detail.response});
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},
+		/**
+		 * Trigger the docker API request
+		 */	
+		go: function() {
+			this.$.ajax.generateRequest();
+		},
+		handleRequest: function(e) {
+			var that = this;
+			this.request.xhr.addEventListener('progress', function (progress) {
+				var lines = that.request.xhr.responseText.split('\n');
+				var linesProgress = lines.map(function(x){
+					  if(x.indexOf('{"errorDetail"') > -1) {
+							var statuses = x.split('{"errorDetail"');
+							return '{"errorDetail"' + statuses[statuses.length-1];
+						} else {
+							var statuses = x.split('{"status"');
+							return '{"status"' + statuses[statuses.length-1];
+						}
+
+				});
+
+	    	jsonStrLines = linesProgress.filter(function(x) {
+	    		return x != undefined && x != '{"status"' && x != '{"errorDetail"';
+	    	});
+				that.result = jsonStrLines.map(function(x){
+					return JSON.parse(x);
+				});
+		  });
+		}
+
+	})
+</script>

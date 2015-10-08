@@ -1,0 +1,69 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<dom-module id="docker-images">
+	<template>
+		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is: 'docker-images',
+		properties: {
+			auto: {
+				type: Boolean,
+				value: false
+			},
+			all: {
+				type: Boolean,
+				value: false,
+				notify: true
+			},
+			filters: {
+				type: Object,
+				notify: true,
+				value: function() {
+					return {
+						//"label": ["foo"] --Example of label filter
+					};
+				}
+			},
+			digests: {
+				type: Boolean,
+				value: false
+			},
+			host: {
+				type: String
+			},
+			result: {
+				type: Object,
+				notify: true,
+				value: function() {
+					return [];
+				}
+			},
+			url: {
+  				type: String,
+  				computed: 'computeUrl(host,all,filters,digests)'
+			},
+		},
+		computeUrl: function(host,_all,_filters,_digests) {
+			
+			var all = this.all ? 1 : 0,
+				digests = this.digests ? 1 : 0;
+
+			return host +"/images/json?all="+all+"&digests="+digests+"&filters="+JSON.stringify(this.filters);
+			
+		},
+		handleResponse: function(e) {
+			this.fire('docker-images-message',{data: e.detail.response});
+		},
+		handleError: function(e) {
+			this.fire('docker-error',{data: e.detail.error});
+		},		
+		go: function() {
+			this.$.ajax.generateRequest();
+		}
+
+	})
+</script>
