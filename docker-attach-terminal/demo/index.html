@@ -13,25 +13,47 @@
 	  <template id="t" is="dom-bind">
       
       		<div>
+      			<div><span>Docker Host (e.g. 127.0.0.1:2375):</span><input id="dockerhost" type="text" oninput="changeHost()" value="{{dockerhost::input}}"/></div>
+      			<div><span>Endpoint: </span><span>{{httphost}}</span>&nbsp;<button onclick="run()">Run!</button></div>
+      			
+      		</div>
+      		<br/>
+      		<div>
       			<div>Ensure you have added the following config in your docker config file</div>
       			<pre>-H tcp://127.0.0.1:2375 --api-enable-cors</pre>
+      			<div>When you click Run!, the elements will do docker pull of busybox image, run it and attach to it.</div>
+      			<br/>
       			<div>Wait until all the Pull, Create and Start status done is set to true then press enter on the terminal below.</div>
       		</div>
 
-			<docker-pull host="http://127.0.0.1:2375" result="{{pullresult}}" done="{{pullDone}}" image="busybox" tag="latest" auto></docker-pull>
-			<docker-create start="{{pullDone}}" host="http://127.0.0.1:2375" result="{{result}}"
+			<docker-pull host="{{httphost}}" result="{{pullresult}}" done="{{pullDone}}" image="busybox" tag="latest"></docker-pull>
+			<docker-create start="{{pullDone}}" host="{{httphost}}" result="{{result}}"
 						   containerid="{{containerid}}" tty="true" open-stdin="true" done="{{createDone}}" image="busybox"></docker-create>
 
-			<docker-start host="http://127.0.0.1:2375" result="{{result}}" containerid="{{containerid}}" start="{{createDone}}" done="{{startDone}}"></docker-start>
+			<docker-start host="{{httphost}}" result="{{result}}" containerid="{{containerid}}" start="{{createDone}}" done="{{startDone}}"></docker-start>
 			<div>
 			<div>Pull Status Done: <span>{{pullDone}}</span></div>
 			<div>Container Created: <span>{{createDone}}</span>&nbsp;<span>{{containerid}}</span></div>
 			<div>Start Container: <span>{{startDone}}</span></div>
 			</div>
 			<br/>
-			<docker-attach-terminal start="{{startDone}}" containerid="{{containerid}}" host="ws://127.0.0.1:2375"></docker-attach-terminal>
-
+			<docker-attach-terminal start="{{startDone}}" containerid="{{containerid}}" host="{{wshost}}"></docker-attach-terminal>
+			
 
 	  </template>
 	</body>
+	<script>
+
+		function changeHost() {
+			var h = document.querySelector("#dockerhost");
+			this.t.httphost = "http://" + this.dockerhost.value;
+			this.t.wshost = "ws://" + this.dockerhost.value;
+		}
+
+		function run() {
+			var dockerpull = document.querySelector("docker-pull");
+			dockerpull.go();
+		}
+
+	</script>
 </html>
