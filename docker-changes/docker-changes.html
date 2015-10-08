@@ -1,6 +1,17 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
+<!--
+The `docker-changes` element exposes docker changes API that will give information
+on container changes from its image
 
+    <docker-changes containerid="c992fa655dae" host="http://127.0.0.1:2375"
+    				result="{{result}}">
+    </docker-change>
+
+The output `result` is a JSON Object that can be used in data binding
+
+@demo demo/index.html
+-->
 <dom-module id="docker-changes">
 	<template>
 		<iron-ajax id="ajax" auto="{{auto}}" url="{{url}}" handle-as="json" method="GET" last-response="{{result}}" on-response="handleResponse" on-error="handleError"></iron-ajax>
@@ -9,17 +20,59 @@
 <script>
 	Polymer({
 		is: 'docker-top',
+		/**
+	     * Fired when docker changes API call has been received.
+	     *
+	     * @event docker-changes
+	     */
+
+		/**
+	     * Fired when docker changes API error has been received.
+	     *
+	     * @event docker-error
+	     */
+
 		properties: {
+			/**
+		    * Automatically call API when rendered
+		    */	
 			auto: {
 				type: Boolean,
 				value: false
 			},
+			/**
+		    * Docker Container ID.
+		    */	
 			containerid: {
 				type: String
 			},
+			/**
+		    * The Docker target host.
+		    */	
 			host: {
 				type: String
 			},
+
+			/**
+		    * Output result Object.
+	        * Example Result:
+	        *
+	        *   [
+			*	     {
+			*	             "Path": "/dev",
+			*	             "Kind": 0
+			*	     },
+			*	     {
+			*	             "Path": "/dev/kmsg",
+			*	             "Kind": 1
+			*	     },
+			*	     {
+			*	             "Path": "/test",
+			*	             "Kind": 1
+			*	     }
+			*	]
+			*
+		    */	
 			result: {
 				type: Object,
 				notify: true,
@@ -27,6 +80,10 @@
 					return [];
 				}
 			},
+
+			/**
+		    * Computed URL, this is automatically generated.
+		    */
 			url: {
   				type: String,
   				computed: 'computeUrl(host,containerid)'
@@ -36,11 +93,15 @@
 			return host +"/containers/"+containerid+"/changes";
 		},
 		handleResponse: function(e) {
-			this.fire('docker-changes-'+this.containerid,{data: e.detail.response});
+			this.fire('docker-changes',{data: e.detail.response});
 		},
 		handleError: function(e) {
 			this.fire('docker-error',{data: e.detail.error});
-		},		
+		},
+
+		/**
+		 * Trigger the docker API request
+		 */		
 		go: function() {
 			this.$.ajax.generateRequest();
 		}
