@@ -1,5 +1,17 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../x-websocket/dist/x-websocket.html">
+<!--
+The `docker-attach` element exposes docker attach websocket API
+
+    <docker-attach containerid="c992fa655dae" host="http://127.0.0.1:2375"></docker-attach>
+
+By supplying mandatory attribute `containerid` and `host`, the element will provide the websocket
+interface to the container. This element will work nicely in tandem with `docker-attach-terminal` 
+which provide UI Terminal to the container.
+
+@demo demo/index.html
+-->
+
 
 <dom-module id="docker-attach">
 	<template>
@@ -10,45 +22,97 @@
 <script>
 	Polymer({
 		is: 'docker-attach',
+
+		/**
+	     * Fired when a docker stdout/stderr message received.
+	     *
+	     * @event docker-attach-message
+	     */
+
 		properties: {
+		    /**
+		    * Docker Container ID.
+		    */			
 			containerid : {
 				type: String
 			},
+			/**
+		    * The Docker Host target.
+		    */
 			host: {
 				type: String
 			},
+
+			/**
+		    * Computed URL, this is automatically generated.
+		    */
 			url: {
   				type: String,
   				computed: 'computeUrl(host, containerid)'
 			},
+
+			/**
+		    * Set to output historical logs.
+		    */
 			logs: {
 				type: Number,
 				value: 0
 			},
+
+			/**
+		    * Set to stream interaction.
+		    */
 			stream :{
 				type: Number,
 				value: 1
 			},
+
+			/**
+		    * Set to interact with stdin.
+		    */
 			stdin: {
 				type: Number,
 				value: 1
 			},
+
+
+			/**
+		    * Set to listen on stdout.
+		    */
 			stdout: {
 				type: Number,
 				value: 1
 			},
+
+
+			/**
+		    * Set to listen on stderr.
+		    */
 			stderr: {
 				type: Number,
 				value: 1
 			},
+
+
+			/**
+		    * Set to readonly.
+		    */
 			readonly: {
 				type: Boolean,
 				value: false
 			},
+
+			/**
+		    * Windows Container support.
+		    */
 			windows: {
 				type: Boolean,
 				value: false
 			},
+
+			/**
+		    * Set to Automatically connect.
+		    */
 			auto: {
 				type: Boolean,
 				value: true
@@ -61,10 +125,17 @@
 			return host +"/containers/" + containerid + "/attach/ws?logs="+this.logs+"&stream="+this.stream+"&stdin="+this.stdin+"&stdout="+this.stdout+"&stderr="+this.stderr;
 		},
 
+		/**
+	    * Open Websocket Connection to docker attach container
+	    */
 		open: function() {
 			this.$.webSocket.open();
 		},
 
+
+		/**
+	    * Send data to the session.
+	    */
 		send: function(data) {
 			if(!this.readonly) {
 	            if(this.windows && data == '') { 
@@ -76,6 +147,10 @@
 	        }
 		},
 
+
+		/**
+	    * Close websocket connection.
+	    */
 		close: function() {
 			this.$.webSocket.close()
 		},
