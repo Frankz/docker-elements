@@ -1,5 +1,6 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-ajax/iron-ajax.html">
+<link rel="import" href="../../task-behavior/task-behavior.html">
 <!--
 The `docker-pull` provides integration with Docker pull API
 
@@ -28,43 +29,16 @@ The `docker-pull` provides integration with Docker pull API
 	     * @event docker-error
 	     */
 		is: 'docker-pull',
+		behaviors: [TaskBehavior],
 		properties: {
 			/**
-		    * Automatically call API when rendered
-		    */	
-			auto: {
-				type: Boolean,
-				value: false
-			},
-			/**
 		    * Docker host endpoint
-		    */	
+		    */
 			host: {
 				type: String
 			},
 			result: {
 				type: Object,
-				notify: true
-			},
-			/**
-		    * Start attribute, when changed to `true` it will call the API.
-		    * This is normally used when data-binding to other element's done output to
-		    * form a workflow or chained process.
-		    */	
-			start: {
-				type: Boolean,
-				notify: true,
-				value: false,
-				observer: '_startChanged'
-			},
-			/**
-		    * Done attribute, when the API call successfully finished, it will
-		    * be changed to `true`. Normally used for data-binding to other element's input to
-		    * start.
-		    */
-			done: {
-				type: Boolean,
-				value: false,
 				notify: true
 			},
 			/**
@@ -113,11 +87,6 @@ The `docker-pull` provides integration with Docker pull API
 		computeUrl: function(host,image,repo,tag,registry) {
 			return host +"/images/create?fromImage="+image+(repo != '' ? "&repo="+ repo : '')+(tag != '' ? "&tag="+ tag : '')+(registry != '' ? "&registry="+ registry : '');
 		},
-		_startChanged: function(newValue, oldValue) {
-    		if(newValue && !oldValue) {
-				this.go();
-			}
-  		},
 		handleResponse: function(e) {
 			this.done = true;
 			this.fire('docker-pull-done',{data: e.detail.response});
@@ -127,8 +96,8 @@ The `docker-pull` provides integration with Docker pull API
 		},
 		/**
 		 * Trigger the docker API request
-		 */	
-		go: function() {
+		 */
+		run: function() {
 			this.$.ajax.generateRequest();
 		},
 		handleRequest: function(e) {
